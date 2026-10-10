@@ -210,6 +210,40 @@ var ENTREGA = [
   'Instruções de utilização preparadas', 'Entrega final preparada', 'Validação final registada'
 ];
 
+var BRIEFING_INICIAL = [
+  [0, 'Qual é o problema mais urgente dos registos em papel: perda de informação, tempo gasto, falta de histórico ou dificuldade em comparar casos?'],
+  [0, 'O que tornaria esta primeira versão um sucesso para a Santa Casa?'],
+  [1, 'Como decorre hoje uma visita domiciliária, desde a preparação até ao registo final?'],
+  [1, 'Que formulários ou fichas em papel são usados hoje? É possível ver um exemplo, sem dados reais?'],
+  [1, 'Onde fica a informação depois da visita (arquivo, Excel, outro sistema)?'],
+  [2, 'Que informação é obrigatória sobre cada agregado (social, familiar e habitacional)?'],
+  [2, 'Já existem listas fechadas definidas (tipos de habitação, problemas, necessidades)?'],
+  [2, 'Cada visita fica ligada ao mesmo agregado ou cada visita é um registo novo?'],
+  [3, 'Como se classifica hoje o nível de prioridade de intervenção? Há critérios ou uma escala já definida?'],
+  [3, 'A prioridade deve ser calculada pela aplicação ou escolhida pelo técnico?'],
+  [3, 'Que alertas ou lembretes seriam úteis (por exemplo, nova visita ou caso parado)?'],
+  [4, 'Quantos técnicos vão usar a ferramenta e que perfis existem?'],
+  [4, 'Todos veem todos os casos ou cada técnico vê apenas os seus?'],
+  [4, 'Quem vai administrar a ferramenta depois da entrega?'],
+  [5, 'Os técnicos vão usá-la durante a visita (telemóvel ou tablet) ou depois, no computador?'],
+  [5, 'É necessário registar sem ligação à internet?'],
+  [5, 'Que filtros e listagens são essenciais (por técnico, prioridade, zona, data da última visita)?'],
+  [6, 'Que regras de proteção de dados a Santa Casa exige?'],
+  [6, 'Em que ferramentas pode a informação ficar alojada?'],
+  [6, 'Confirmam que, no desenvolvimento e nos testes, só entram dados fictícios ou anónimos?'],
+  [7, 'O que fica de fora desta fase, além do matching de donativos?'],
+  [7, 'Quem valida cada fase pela Santa Casa e com que rapidez costuma responder?'],
+  [7, 'Podem disponibilizar exemplos fictícios para testes?'],
+  [7, 'Em que ferramenta no-code prefere a parceira que a solução seja feita (por exemplo, Airtable)?'],
+  [7, 'Como e a quem posso fazer perguntas de seguimento: à Ana Luísa ou através da consultora?']
+];
+function briefingInicial() {
+  var t = Date.now(), d = today();
+  return BRIEFING_INICIAL.map(function (q, i) {
+    return { id: uid(), criado: t + i, pergunta: q[1], resposta: '', categoria: CATEGORIAS[q[0]], estado: 'por perguntar', data: d, observacoes: '' };
+  });
+}
+
 var DESC_OFICIAL = 'Nesta fase, será desenvolvida uma aplicação digital para apoiar técnicos nas visitas domiciliárias, permitindo registar e consultar de forma estruturada a caracterização social, familiar e habitacional dos agregados. O objetivo principal é substituir os registos em papel, centralizar a informação de cada caso e facilitar a avaliação e o acompanhamento ao longo do tempo, incluindo a classificação do nível de prioridade de intervenção. O MVP deverá focar-se na estrutura e no funcionamento da aplicação, utilizando apenas dados fictícios ou anónimos durante o desenvolvimento e os testes. As funcionalidades relacionadas com plataformas de bens ou matching de donativos não estão incluídas nesta fase. Os detalhes e requisitos serão aprofundados na primeira reunião com o parceiro.';
 
 function defaults() {
@@ -229,9 +263,9 @@ function defaults() {
       emailConsultora: 'carlamiguelassis@gmail.com',
       descricao: DESC_OFICIAL
     },
-    meta: { ultimaExportacao: '' },
+    meta: { ultimaExportacao: '', briefingInicial: true },
     categorias: CATEGORIAS.slice(),
-    briefing: [],
+    briefing: briefingInicial(),
     requisitos: [],
     tarefas: [{
       id: uid(), criado: t,
@@ -333,6 +367,12 @@ var Store = {
         var err = validate(p);
         if (err) throw new Error(err);
         this.data = normalize(p.dados);
+        if (!this.data.meta.briefingInicial) {
+          // uma só vez: só acrescenta se o briefing estiver vazio; nunca altera registos existentes
+          if (!this.data.briefing.length) this.data.briefing = briefingInicial();
+          this.data.meta.briefingInicial = true;
+          this.persist();
+        }
         return;
       } catch (e) {
         this.loadMsg = 'Os dados guardados neste navegador estavam ilegíveis. Foi iniciado um caderno novo; a versão ilegível ficou guardada à parte (chave «' + KEY + ':corrompido») para não se perder.';
@@ -891,6 +931,7 @@ function importar(file) {
     var msg = 'Vai SUBSTITUIR todos os registos atuais (' + atuais + ') pelos da cópia (' + novos + ', exportada em ' + quando + ').\n\nEsta ação não pode ser desfeita. Se tiver dúvidas, cancele e exporte primeiro os dados atuais.\n\nContinuar?';
     if (!window.confirm(msg)) { toast('Importação cancelada. Nada foi alterado.'); return; }
     var novo = normalize(p.dados);
+    novo.meta.briefingInicial = true;
     var r = Store.commit(function (d) {
       Object.keys(d).forEach(function (k) { delete d[k]; });
       Object.assign(d, novo);
