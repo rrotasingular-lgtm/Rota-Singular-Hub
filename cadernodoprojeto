@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1f5f7a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Caderno">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231f5f7a'/%3E%3Cpath d='M28 24h38a6 6 0 0 1 6 6v46H34a6 6 0 0 1-6-6z' fill='none' stroke='white' stroke-width='6'/%3E%3Cpath d='M40 42h24M40 54h24M40 66h14' stroke='white' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
 <title>Caderno do projeto — Casas Saudáveis: Famílias Felizes</title>
 <style>
 /* ============ Base e cores ============ */
@@ -129,6 +135,18 @@ ul.plain{margin:.3rem 0;padding-left:1.2rem}
   .sheet{border-radius:14px}
 }
 
+.tabbar{display:none}
+@media (max-width:639px){
+  nav{display:none}
+  body{padding-bottom:calc(64px + env(safe-area-inset-bottom,0))}
+  .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0)}
+  .tabbar button{flex:1;min-height:58px;border:0;background:none;color:var(--muted);font:inherit;font-size:.72rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .tabbar button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .tabbar button[aria-current="page"]{color:var(--acc);font-weight:600}
+  .toast{bottom:calc(76px + env(safe-area-inset-bottom,0))}
+}
+.morelist{display:grid;gap:.5rem}
+.morelist button{text-align:left}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(1rem + env(safe-area-inset-bottom,0));z-index:30;background:#1c2430;color:#fff;padding:.7rem 1rem;border-radius:var(--radius);max-width:92%;font-size:.92rem;box-shadow:0 2px 10px rgba(0,0,0,.3)}
 .toast.bad{background:#9a1f2b}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
@@ -144,13 +162,15 @@ ul.plain{margin:.3rem 0;padding-left:1.2rem}
 <div class="banner-wrap" id="banner"></div>
 <main id="view"></main>
 
+<div class="tabbar" id="tabbar" role="navigation" aria-label="Navegação principal"></div>
+
 <div class="overlay" id="modal" hidden>
   <form class="sheet" id="mForm" role="dialog" aria-modal="true" aria-labelledby="mTitle">
     <header><h3 id="mTitle"></h3></header>
     <div class="body" id="mBody"></div>
     <footer>
       <button type="button" class="btn" data-act="close">Cancelar</button>
-      <button type="submit" class="btn pri">Guardar</button>
+      <button type="submit" class="btn pri" id="mSave">Guardar</button>
     </footer>
   </form>
 </div>
@@ -534,6 +554,7 @@ function openForm(cfg) {
   $('#mBody').innerHTML = cfg.bodyHtml || cfg.fields.map(function (f) {
     return fieldHtml(f, cfg.values[f.k] != null ? cfg.values[f.k] : '');
   }).join('');
+  $('#mSave').hidden = !!cfg.semGuardar;
   $('#modal').hidden = false;
   document.body.classList.add('lock');
   if (window.matchMedia && matchMedia('(pointer:fine)').matches) {
@@ -782,7 +803,7 @@ VIEWS.painel = function () {
     ? '<p><b>' + esc(prox.nome) + '</b><br>' + esc(fmtDate(prox.data)) + (prox.hora ? ' às ' + esc(prox.hora) : '') +
       ' <span class="badge ' + bc(prox.estado) + '">' + esc(cap(prox.estado)) + '</span></p>'
     : '<p class="muted">Não há datas futuras por concluir no calendário.</p>') +
-    '<a href="#marcos">Ver calendário</a></div>';
+    '<a href="#marcos" data-go="marcos">Ver calendário</a></div>';
 
   html += '<div class="card"><h3>Atalhos</h3><div class="row" style="margin-top:.5rem">' +
     '<button class="btn pri" data-act="atalho" data-w="tarefa">Nova tarefa</button>' +
@@ -793,7 +814,7 @@ VIEWS.painel = function () {
     ? ultimas.map(function (x) {
         return '<p><b>' + esc(x.titulo) + '</b> <span class="badge ' + bc(x.estado) + '">' + esc(cap(x.estado)) + '</span>' +
           (x.data ? '<br><span class="muted small">' + esc(fmtDate(x.data)) + '</span>' : '') + '</p>';
-      }).join('') + '<a href="#decisoes">Ver todas</a>'
+      }).join('') + '<a href="#decisoes" data-go="decisoes">Ver todas</a>'
     : '<p class="muted">Ainda não há decisões nem notas registadas.</p>') + '</div>';
 
   html += '<div class="card"><div class="head"><h3>Dados do projeto</h3><button class="btn sm" data-act="projeto">Editar</button></div>' +
@@ -882,14 +903,44 @@ function importar(file) {
 /* =====================================================================
    10. RENDERIZAÇÃO E EVENTOS
    ===================================================================== */
-var route = 'painel';
+var route = (location.hash || '#painel').slice(1);
+var TAB = [['painel', 'Painel'], ['briefing', 'Briefing'], ['requisitos', 'Requisitos'], ['tarefas', 'Tarefas']];
+var ICON = {
+  painel: '<svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>',
+  briefing: '<svg viewBox="0 0 24 24"><path d="M5 5h14v10H9l-4 4z"/></svg>',
+  requisitos: '<svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>',
+  tarefas: '<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/></svg>',
+  mais: '<svg viewBox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3"/></svg>'
+};
+function go(r) {
+  if (!VIEWS[r]) r = 'painel';
+  route = r;
+  try { history.replaceState(null, '', '#' + r); } catch (e) { /* alguns ambientes não permitem; a navegação continua a funcionar */ }
+  render();
+  window.scrollTo(0, 0);
+}
+function openMais() {
+  var resto = NAV.filter(function (n) { return TAB.every(function (t) { return t[0] !== n[0]; }); });
+  openForm({
+    titulo: 'Mais secções', semGuardar: true,
+    bodyHtml: '<div class="morelist">' + resto.map(function (n) {
+      return '<button type="button" class="btn" data-go="' + n[0] + '">' + esc(n[1]) + '</button>';
+    }).join('') + '</div>',
+    onSave: function () { return true; }
+  });
+}
 
 function render() {
-  var h = (location.hash || '#painel').slice(1);
-  route = VIEWS[h] ? h : 'painel';
+  if (!VIEWS[route]) route = 'painel';
   $('#nav').innerHTML = NAV.map(function (n) {
-    return '<a href="#' + n[0] + '"' + (n[0] === route ? ' aria-current="page"' : '') + '>' + esc(n[1]) + '</a>';
+    return '<a href="#' + n[0] + '" data-go="' + n[0] + '"' + (n[0] === route ? ' aria-current="page"' : '') + '>' + esc(n[1]) + '</a>';
   }).join('');
+  var principais = TAB.map(function (t) {
+    return '<button type="button" data-go="' + t[0] + '"' + (t[0] === route ? ' aria-current="page"' : '') + '>' + ICON[t[0]] + '<span>' + esc(t[1]) + '</span></button>';
+  }).join('');
+  var maisAtivo = TAB.every(function (t) { return t[0] !== route; });
+  principais += '<button type="button" data-act="mais"' + (maisAtivo ? ' aria-current="page"' : '') + '>' + ICON.mais + '<span>Mais</span></button>';
+  $('#tabbar').innerHTML = principais;
   var b = '';
   if (!Store.ok) b += '<div class="banner bad"><b>O armazenamento local não está disponível</b> (pode estar bloqueado ou em modo privado). Pode usar o caderno, mas <b>nada fica guardado</b> ao fechar ou atualizar a página. Use «Cópia de segurança» para exportar o que registar.</div>';
   if (Store.loadMsg) b += '<div class="banner">' + esc(Store.loadMsg) + '</div>';
@@ -900,11 +951,19 @@ function render() {
 }
 
 document.addEventListener('click', function (ev) {
+  var g = ev.target.closest('[data-go]');
+  if (g) {
+    ev.preventDefault();
+    if (!$('#modal').hidden) closeForm();
+    go(g.getAttribute('data-go'));
+    return;
+  }
   var el = ev.target.closest('[data-act]');
   if (!el || el.tagName === 'SELECT' || el.type === 'checkbox') return;
   var act = el.getAttribute('data-act'), key = el.getAttribute('data-sec'), id = el.getAttribute('data-id');
   switch (act) {
     case 'close': closeForm(); break;
+    case 'mais': openMais(); break;
     case 'novo': openItemForm(key); break;
     case 'edit': openItemForm(key, id); break;
     case 'del': deleteItem(key, id); break;
@@ -958,7 +1017,7 @@ document.addEventListener('change', function (ev) {
 
 $('#mForm').addEventListener('submit', submitForm);
 document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && !$('#modal').hidden) closeForm(); });
-window.addEventListener('hashchange', function () { window.scrollTo(0, 0); render(); });
+window.addEventListener('hashchange', function () { go((location.hash || '#painel').slice(1)); });
 
 /* =====================================================================
    11. ARRANQUE
