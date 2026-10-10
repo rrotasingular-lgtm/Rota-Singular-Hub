@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Caderno do projeto — Casas Saudáveis: Famílias Felizes</title>
+<style>
+/* ============ Base e cores ============ */
+:root{
+  --bg:#f4f6f8; --card:#ffffff; --txt:#1c2430; --muted:#5a6678; --line:#d9dee6;
+  --acc:#1f5f7a; --acc-txt:#ffffff; --acc-soft:#e3eff4;
+  --ok:#1d6b3f; --ok-bg:#e1f2e8;
+  --warn:#7a5200; --warn-bg:#fbefd0;
+  --info:#1f4f9a; --info-bg:#e2ebfa;
+  --bad:#9a1f2b; --bad-bg:#fbe3e5;
+  --neu:#46515f; --neu-bg:#e8ecf1;
+  --radius:8px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#13171c; --card:#1b2129; --txt:#e6eaf0; --muted:#98a3b3; --line:#2d3541;
+    --acc:#6cb4cf; --acc-txt:#0d1a20; --acc-soft:#1b2c35;
+    --ok:#7fd1a0; --ok-bg:#183626;
+    --warn:#f0c46a; --warn-bg:#3b2f12;
+    --info:#8fb4f0; --info-bg:#1b2b4a;
+    --bad:#f19aa2; --bad-bg:#44212a;
+    --neu:#b4bfcd; --neu-bg:#2a313b;
+  }
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--txt);
+  font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+body.lock{overflow:hidden}
+h1,h2,h3{line-height:1.25;margin:0}
+h2{font-size:1.35rem}
+h3{font-size:1.05rem}
+p{margin:.4rem 0}
+a{color:var(--acc)}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+
+/* ============ Estrutura ============ */
+.top{background:var(--card);border-bottom:1px solid var(--line);padding:.75rem 1rem;padding-top:calc(.75rem + env(safe-area-inset-top,0))}
+.top .in{max-width:900px;margin:0 auto}
+.top h1{font-size:1.05rem}
+.top .sub{color:var(--muted);font-size:.85rem}
+nav{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);overflow-x:auto;-webkit-overflow-scrolling:touch}
+nav .in{display:flex;max-width:900px;margin:0 auto;padding:0 .5rem;white-space:nowrap}
+nav a{display:block;padding:.8rem .8rem;text-decoration:none;color:var(--muted);font-size:.95rem;border-bottom:3px solid transparent}
+nav a[aria-current="page"]{color:var(--acc);border-bottom-color:var(--acc);font-weight:600}
+main{max-width:900px;margin:0 auto;padding:1rem;padding-left:max(1rem,env(safe-area-inset-left,0));padding-right:max(1rem,env(safe-area-inset-right,0))}
+.banner{max-width:900px;margin:.75rem auto 0;padding:.75rem 1rem;border-radius:var(--radius);background:var(--warn-bg);color:var(--warn);font-size:.92rem}
+.banner.bad{background:var(--bad-bg);color:var(--bad)}
+.banner-wrap{padding:0 1rem}
+
+/* ============ Componentes ============ */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:1rem;margin:0 0 .75rem}
+.head{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.row{display:flex;flex-wrap:wrap;gap:.5rem}
+.btn{
+  font:inherit;font-size:.95rem;min-height:44px;padding:.45rem .95rem;border-radius:var(--radius);
+  border:1px solid var(--line);background:var(--card);color:var(--txt);cursor:pointer;
+}
+.btn:hover{border-color:var(--acc)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:var(--acc-txt);font-weight:600}
+.btn.sm{min-height:38px;padding:.25rem .7rem;font-size:.88rem}
+.btn.danger{color:var(--bad)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem;margin-bottom:.75rem}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:.8rem 1rem}
+.stat b{display:block;font-size:1.7rem;line-height:1.2}
+.stat span{color:var(--muted);font-size:.88rem}
+.badge{display:inline-block;padding:.1rem .55rem;border-radius:999px;font-size:.8rem;background:var(--neu-bg);color:var(--neu);white-space:nowrap}
+.badge.ok{background:var(--ok-bg);color:var(--ok)}
+.badge.warn{background:var(--warn-bg);color:var(--warn)}
+.badge.info{background:var(--info-bg);color:var(--info)}
+.badge.bad,.badge.hi{background:var(--bad-bg);color:var(--bad)}
+.badges{display:flex;flex-wrap:wrap;gap:.35rem;margin:.35rem 0}
+.item{border-left:4px solid var(--line)}
+.item.ok{border-left-color:var(--ok)}
+.item.warn{border-left-color:var(--warn);border-left-style:dashed}
+.item.info{border-left-color:var(--info)}
+.item.bad{border-left-color:var(--bad)}
+.item h3{word-break:break-word}
+.ln{margin:.3rem 0;word-break:break-word}
+.ln b{font-weight:600;color:var(--muted);font-size:.88rem;display:block}
+.ln .v{white-space:pre-wrap}
+.late{color:var(--bad);font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-top:.6rem}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0}
+.chip{font:inherit;font-size:.88rem;min-height:36px;padding:.2rem .75rem;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--txt);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--acc-soft);border-color:var(--acc);color:var(--acc);font-weight:600}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.5rem;margin:.5rem 0 .9rem;align-items:end}
+.filters label{font-size:.85rem;color:var(--muted);display:block}
+select,input[type=text],input[type=date],input[type=time],input[type=email],textarea{
+  font:inherit;font-size:16px;width:100%;min-height:44px;padding:.45rem .6rem;border-radius:var(--radius);
+  border:1px solid var(--line);background:var(--card);color:var(--txt);
+}
+textarea{resize:vertical;min-height:80px}
+.qs{width:auto;min-height:38px;font-size:.9rem}
+.empty{text-align:center;color:var(--muted);padding:1.5rem 1rem;border:1px dashed var(--line);border-radius:var(--radius)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.6rem 1rem}
+details{margin:.4rem 0}
+summary{cursor:pointer;min-height:36px;padding:.35rem 0;font-weight:600}
+ul.plain{margin:.3rem 0;padding-left:1.2rem}
+.check{display:flex;gap:.75rem;align-items:flex-start}
+.check input[type=checkbox]{width:24px;height:24px;margin-top:.15rem;flex:none}
+.check.done .t{text-decoration:line-through;color:var(--muted)}
+.progress{height:8px;border-radius:999px;background:var(--neu-bg);overflow:hidden;margin:.4rem 0 .9rem}
+.progress i{display:block;height:100%;background:var(--ok)}
+
+/* ============ Formulário (janela) ============ */
+.overlay{position:fixed;inset:0;z-index:20;background:rgba(10,15,20,.55);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--card);color:var(--txt);width:100%;max-width:560px;max-height:92vh;max-height:92dvh;display:flex;flex-direction:column;border-radius:14px 14px 0 0}
+.sheet header{padding:.9rem 1rem;border-bottom:1px solid var(--line)}
+.sheet .body{padding:1rem;overflow:auto;-webkit-overflow-scrolling:touch}
+.sheet footer{padding:.75rem 1rem;padding-bottom:calc(.75rem + env(safe-area-inset-bottom,0));border-top:1px solid var(--line);display:flex;gap:.5rem;justify-content:flex-end}
+.fld{display:block;margin-bottom:.9rem}
+.fld>span{display:block;font-size:.88rem;color:var(--muted);margin-bottom:.2rem}
+.catrow{display:flex;gap:.5rem;margin-bottom:.5rem}
+@media (min-width:640px){
+  .overlay{align-items:center}
+  .sheet{border-radius:14px}
+}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(1rem + env(safe-area-inset-bottom,0));z-index:30;background:#1c2430;color:#fff;padding:.7rem 1rem;border-radius:var(--radius);max-width:92%;font-size:.92rem;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.toast.bad{background:#9a1f2b}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="in">
+  <h1>Caderno do projeto</h1>
+  <div class="sub">Descodifica-te · Fledge Institute — uso pessoal e privado</div>
+</div></div>
+<nav aria-label="Secções"><div class="in" id="nav"></div></nav>
+<div class="banner-wrap" id="banner"></div>
+<main id="view"></main>
+
+<div class="overlay" id="modal" hidden>
+  <form class="sheet" id="mForm" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <header><h3 id="mTitle"></h3></header>
+    <div class="body" id="mBody"></div>
+    <footer>
+      <button type="button" class="btn" data-act="close">Cancelar</button>
+      <button type="submit" class="btn pri">Guardar</button>
+    </footer>
+  </form>
+</div>
+<input type="file" id="fileImp" accept=".json,application/json" hidden>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+'use strict';
+(function () {
+
+/* =====================================================================
+   1. CONSTANTES E DADOS INICIAIS
+   ===================================================================== */
+var KEY = 'caderno-projeto:v1';
+var COLS = ['briefing', 'requisitos', 'tarefas', 'decisoes', 'marcos', 'dev', 'entrega'];
+
+var OPT = {
+  briefing: ['por perguntar', 'respondida', 'requer esclarecimento'],
+  prio: ['alta', 'média', 'baixa'],
+  req: ['por validar', 'confirmado', 'em desenvolvimento', 'concluído', 'excluído'],
+  tar: ['por fazer', 'em curso', 'bloqueada', 'concluída'],
+  dec: ['proposta', 'por validar', 'confirmada'],
+  marco: ['por confirmar', 'confirmado', 'concluído', 'reagendado'],
+  dev: ['por iniciar', 'em curso', 'concluído', 'bloqueado'],
+  teste: ['não testado', 'passou', 'falhou', 'parcial'],
+  fases: ['Matchmaking e reunião de briefing', 'Planeamento', 'Desenvolvimento', 'Afinação e testes finais', 'Aprovação e entrega']
+};
+
+var CATEGORIAS = [
+  'Objetivos do projeto', 'Processo de trabalho atual', 'Dados a registar', 'Acompanhamento e prioridades',
+  'Utilizadores e acessos', 'Utilização da aplicação', 'Privacidade e segurança', 'Âmbito e validação'
+];
+
+var ENTREGA = [
+  'Requisitos e âmbito documentados', 'Estrutura da solução documentada', 'Primeira versão funcional preparada',
+  'Testes finais registados', 'Feedback da parceira documentado', 'Ajustes finais registados',
+  'Instruções de utilização preparadas', 'Entrega final preparada', 'Validação final registada'
+];
+
+var DESC_OFICIAL = 'Nesta fase, será desenvolvida uma aplicação digital para apoiar técnicos nas visitas domiciliárias, permitindo registar e consultar de forma estruturada a caracterização social, familiar e habitacional dos agregados. O objetivo principal é substituir os registos em papel, centralizar a informação de cada caso e facilitar a avaliação e o acompanhamento ao longo do tempo, incluindo a classificação do nível de prioridade de intervenção. O MVP deverá focar-se na estrutura e no funcionamento da aplicação, utilizando apenas dados fictícios ou anónimos durante o desenvolvimento e os testes. As funcionalidades relacionadas com plataformas de bens ou matching de donativos não estão incluídas nesta fase. Os detalhes e requisitos serão aprofundados na primeira reunião com o parceiro.';
+
+function defaults() {
+  var t = Date.now();
+  var marco = function (nome, data, hora, desc) {
+    return { id: uid(), criado: t, nome: nome, data: data, hora: hora, descricao: desc, estado: 'por confirmar' };
+  };
+  return {
+    projeto: {
+      nome: 'Casas Saudáveis: Famílias Felizes',
+      organizacao: 'Santa Casa da Misericórdia de Lisboa',
+      formacao: 'Descodifica-te — Fledge Institute',
+      tipo: 'Ferramenta interna — CRM tool',
+      interlocutora: 'Ana Luísa Gomes',
+      contacto: '963269959',
+      consultora: 'Carla da Silva Assis',
+      emailConsultora: 'carlamiguelassis@gmail.com',
+      descricao: DESC_OFICIAL
+    },
+    meta: { ultimaExportacao: '' },
+    categorias: CATEGORIAS.slice(),
+    briefing: [],
+    requisitos: [],
+    tarefas: [{
+      id: uid(), criado: t,
+      titulo: 'Confirmar a data da 1.ª reunião e o convite para todos os envolvidos',
+      descricao: '', fase: OPT.fases[0], prioridade: 'alta', estado: 'por fazer', dataLimite: '',
+      notas: 'Indicado como próximo passo no email da formação.'
+    }],
+    decisoes: [],
+    marcos: [
+      marco('1.ª reunião de briefing', '2026-10-09', '14:40', 'Apresentação do desafio e esclarecimento de dúvidas; definição das principais necessidades e requisitos; alinhamento sobre o plano de desenvolvimento. Data sugerida pela formação.'),
+      marco('2.ª reunião — validação do desenvolvimento', '2026-10-15', '12:00', 'Feedback sobre o progresso e ajustes necessários. Data sugerida pela formação.'),
+      marco('3.ª reunião — apresentação da versão final', '2026-10-20', '13:00', 'Apresentação da solução final e considerações finais. Data sugerida pela formação.'),
+      marco('Prazo: planeamento e arquitetura', '2026-10-25', '', 'Plano de ação, especificações e arquitetura do projeto.'),
+      marco('Prazo: primeira versão funcional', '2026-11-15', '', 'Primeira versão funcional para feedback da parceira.'),
+      marco('Prazo: afinação e testes finais', '2026-11-29', '', 'Refinamento do projeto e testes finais.'),
+      marco('Prazo: aprovação e entrega', '2026-12-06', '', 'Aprovação final e entrega do projeto à parceira.')
+    ],
+    dev: [],
+    entrega: ENTREGA.map(function (x) { return { id: uid(), criado: t, texto: x, concluido: false, observacoes: '' }; })
+  };
+}
+
+/* =====================================================================
+   2. UTILITÁRIOS
+   ===================================================================== */
+function $(s, r) { return (r || document).querySelector(s); }
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function cap(s) { s = String(s || ''); return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+function pad(n) { return (n < 10 ? '0' : '') + n; }
+function today() { var d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+var MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+function fmtDate(s) {
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
+  return m ? (+m[3]) + ' ' + MESES[+m[2] - 1] + ' ' + m[1] : (s || '');
+}
+function fmtStamp(iso) {
+  if (!iso) return '';
+  var d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return fmtDate(d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())) + ' às ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+function plural(n, um, varios) { return n === 1 ? um : varios; }
+
+/* =====================================================================
+   3. VALIDAÇÃO DE COPIAS (importação e leitura do armazenamento)
+   ===================================================================== */
+function validate(p) {
+  if (!p || typeof p !== 'object' || Array.isArray(p)) return 'O ficheiro não tem a estrutura esperada.';
+  if (p.app !== 'caderno-projeto') return 'Este ficheiro não parece ser uma cópia deste caderno.';
+  var x = p.dados;
+  if (!x || typeof x !== 'object' || Array.isArray(x)) return 'Faltam os dados na cópia.';
+  for (var i = 0; i < COLS.length; i++) {
+    var c = COLS[i];
+    if (!Array.isArray(x[c])) return 'Falta a lista «' + c + '» na cópia.';
+    for (var j = 0; j < x[c].length; j++) {
+      var it = x[c][j];
+      if (!it || typeof it !== 'object' || Array.isArray(it) || typeof it.id !== 'string') return 'Há registos inválidos em «' + c + '».';
+    }
+  }
+  if (!Array.isArray(x.categorias) || x.categorias.some(function (c) { return typeof c !== 'string'; })) return 'As categorias da cópia são inválidas.';
+  if (!x.projeto || typeof x.projeto !== 'object' || Array.isArray(x.projeto)) return 'Faltam os dados do projeto na cópia.';
+  return null;
+}
+function normalize(x) {
+  var d = defaults();
+  d.projeto = Object.assign(d.projeto, x.projeto);
+  d.meta = Object.assign({ ultimaExportacao: '' }, x.meta && typeof x.meta === 'object' ? x.meta : {});
+  d.categorias = x.categorias.slice();
+  COLS.forEach(function (c) {
+    d[c] = x[c].map(function (it) { return Object.assign({ criado: 0 }, it); });
+  });
+  return d;
+}
+function countAll(x) {
+  return COLS.reduce(function (n, c) { return n + (x[c] ? x[c].length : 0); }, 0);
+}
+
+/* =====================================================================
+   4. ARMAZENAMENTO CENTRALIZADO (único ponto de acesso a localStorage)
+   commit devolve: 'ok' (guardado) | 'temp' (só em memória) | 'fail' (revertido)
+   ===================================================================== */
+var Store = {
+  ok: true,
+  data: null,
+  loadMsg: '',
+
+  init: function () {
+    var raw = null;
+    try { localStorage.setItem('__cp_teste', '1'); localStorage.removeItem('__cp_teste'); } catch (e) { this.ok = false; }
+    if (this.ok) { try { raw = localStorage.getItem(KEY); } catch (e) { this.ok = false; } }
+    if (raw) {
+      try {
+        var p = JSON.parse(raw);
+        var err = validate(p);
+        if (err) throw new Error(err);
+        this.data = normalize(p.dados);
+        return;
+      } catch (e) {
+        this.loadMsg = 'Os dados guardados neste navegador estavam ilegíveis. Foi iniciado um caderno novo; a versão ilegível ficou guardada à parte (chave «' + KEY + ':corrompido») para não se perder.';
+        try { localStorage.setItem(KEY + ':corrompido', raw); } catch (e2) { /* sem espaço: nada a fazer */ }
+      }
+    }
+    this.data = defaults();
+    if (this.ok) this.persist();
+  },
+
+  persist: function () {
+    if (!this.ok) return false;
+    try {
+      localStorage.setItem(KEY, JSON.stringify({ app: 'caderno-projeto', versao: 1, guardadoEm: new Date().toISOString(), dados: this.data }));
+      return true;
+    } catch (e) { return false; }
+  },
+
+  commit: function (fn) {
+    var antes = JSON.stringify(this.data);
+    try { fn(this.data); } catch (e) { this.data = JSON.parse(antes); return 'fail'; }
+    if (this.persist()) return 'ok';
+    if (!this.ok) return 'temp';
+    this.data = JSON.parse(antes);   // falha ao gravar (ex.: sem espaço): reverte
+    return 'fail';
+  },
+
+  list: function (c) { return this.data[c]; },
+  get: function (c, id) { return this.data[c].filter(function (x) { return x.id === id; })[0]; },
+  add: function (c, item) {
+    item.id = uid(); item.criado = Date.now();
+    return this.commit(function (d) { d[c].push(item); });
+  },
+  update: function (c, id, patch) {
+    return this.commit(function (d) {
+      var it = d[c].filter(function (x) { return x.id === id; })[0];
+      if (it) Object.assign(it, patch);
+    });
+  },
+  remove: function (c, id) {
+    return this.commit(function (d) { d[c] = d[c].filter(function (x) { return x.id !== id; }); });
+  }
+};
+
+/* =====================================================================
+   5. DEFINIÇÃO DAS SECÇÕES (campos, filtros, ordenação)
+   ===================================================================== */
+var PRIO_ORD = { 'alta': 0, 'média': 1, 'baixa': 2 };
+function byCriado(a, b) { return (a.criado || 0) - (b.criado || 0); }
+
+var SEC = {
+  briefing: {
+    col: 'briefing', nome: 'Briefing', tit: 'pergunta', novo: 'Nova pergunta', um: 'pergunta',
+    intro: 'Perguntas e respostas recolhidas nas reuniões. As respostas são escritas por si, depois de falar com a parceira.',
+    vazio: 'Ainda não há perguntas. Use «Nova pergunta» para registar o que quer saber ou o que ouviu na reunião.',
+    fields: [
+      { k: 'pergunta', l: 'Pergunta', t: 'textarea', rows: 2, req: 1 },
+      { k: 'resposta', l: 'Resposta ou apontamentos', t: 'textarea', rows: 4 },
+      { k: 'categoria', l: 'Categoria', t: 'select', o: function () { return Store.data.categorias; }, badge: 1 },
+      { k: 'estado', l: 'Estado', t: 'select', o: OPT.briefing, def: 'por perguntar', req: 1, badge: 1, quick: 1 },
+      { k: 'data', l: 'Data do registo', t: 'date', def: today },
+      { k: 'observacoes', l: 'Observações', t: 'textarea', rows: 2 }
+    ],
+    filters: ['categoria', 'estado'], summary: 'estado', sort: byCriado
+  },
+  requisitos: {
+    col: 'requisitos', nome: 'Requisitos', tit: 'titulo', novo: 'Novo requisito', um: 'requisito',
+    intro: 'Só é requisito confirmado o que marcar como «Confirmado». Tudo o resto são hipóteses ou questões em aberto.',
+    vazio: 'Ainda não há requisitos. Use «Novo requisito» quando algo surgir no briefing.',
+    fields: [
+      { k: 'titulo', l: 'Título', t: 'text', req: 1 },
+      { k: 'descricao', l: 'Descrição', t: 'textarea', rows: 3 },
+      { k: 'origem', l: 'Origem ou contexto', t: 'text' },
+      { k: 'categoria', l: 'Categoria', t: 'select', o: function () { return Store.data.categorias; }, badge: 1 },
+      { k: 'prioridade', l: 'Prioridade', t: 'select', o: OPT.prio, def: 'média', req: 1, badge: 1, pre: 'Prioridade ' },
+      { k: 'estado', l: 'Estado', t: 'select', o: OPT.req, def: 'por validar', req: 1, badge: 1, quick: 1 },
+      { k: 'observacoes', l: 'Observações', t: 'textarea', rows: 2 }
+    ],
+    filters: ['estado', 'prioridade', 'categoria'], summary: 'estado',
+    sort: function (a, b) { return (PRIO_ORD[a.prioridade] || 0) - (PRIO_ORD[b.prioridade] || 0) || byCriado(a, b); }
+  },
+  tarefas: {
+    col: 'tarefas', nome: 'Tarefas', tit: 'titulo', novo: 'Nova tarefa', um: 'tarefa',
+    intro: 'As tarefas pendentes aparecem primeiro; as concluídas ficam no fim.',
+    vazio: 'Ainda não há tarefas. Use «Nova tarefa» para começar.',
+    fields: [
+      { k: 'titulo', l: 'Título', t: 'text', req: 1 },
+      { k: 'descricao', l: 'Descrição', t: 'textarea', rows: 3 },
+      { k: 'fase', l: 'Fase do projeto', t: 'select', o: OPT.fases, badge: 1 },
+      { k: 'prioridade', l: 'Prioridade', t: 'select', o: OPT.prio, def: 'média', req: 1, badge: 1, pre: 'Prioridade ' },
+      { k: 'estado', l: 'Estado', t: 'select', o: OPT.tar, def: 'por fazer', req: 1, badge: 1, quick: 1 },
+      { k: 'dataLimite', l: 'Data limite', t: 'date' },
+      { k: 'notas', l: 'Notas', t: 'textarea', rows: 2 }
+    ],
+    filters: ['fase', 'prioridade', 'estado'], summary: 'estado',
+    sort: function (a, b) {
+      var da = a.estado === 'concluída' ? 1 : 0, db = b.estado === 'concluída' ? 1 : 0;
+      if (da !== db) return da - db;
+      var pa = PRIO_ORD[a.prioridade] || 0, pb = PRIO_ORD[b.prioridade] || 0;
+      if (pa !== pb) return pa - pb;
+      var la = a.dataLimite || '9999', lb = b.dataLimite || '9999';
+      return la < lb ? -1 : la > lb ? 1 : byCriado(a, b);
+    }
+  },
+  decisoes: {
+    col: 'decisoes', nome: 'Decisões e notas', tit: 'titulo', novo: 'Nova decisão ou nota', um: 'registo',
+    intro: 'Decisões técnicas, alterações de âmbito e respetivas justificações. Nada fica «confirmada» sem ser você a marcar.',
+    vazio: 'Ainda não há decisões nem notas. Use «Nova decisão ou nota» para registar a primeira.',
+    fields: [
+      { k: 'titulo', l: 'Título', t: 'text', req: 1 },
+      { k: 'descricao', l: 'Descrição da decisão ou nota', t: 'textarea', rows: 4, req: 1 },
+      { k: 'data', l: 'Data', t: 'date', def: today },
+      { k: 'contexto', l: 'Contexto ou motivo', t: 'textarea', rows: 3 },
+      { k: 'estado', l: 'Estado', t: 'select', o: OPT.dec, def: 'proposta', req: 1, badge: 1, quick: 1 }
+    ],
+    filters: ['estado'], summary: 'estado',
+    sort: function (a, b) {
+      var da = a.data || '', db = b.data || '';
+      return da < db ? 1 : da > db ? -1 : byCriado(b, a);
+    }
+  },
+  marcos: {
+    col: 'marcos', nome: 'Calendário', tit: 'nome', novo: 'Novo marco', um: 'marco',
+    intro: 'Datas indicadas pela formação. As reuniões foram apresentadas como sugestões: confirme-as com a parceira e altere o estado quando isso acontecer.',
+    vazio: 'Não há marcos. Use «Novo marco» para acrescentar um.',
+    fields: [
+      { k: 'nome', l: 'Nome', t: 'text', req: 1 },
+      { k: 'data', l: 'Data', t: 'date', req: 1 },
+      { k: 'hora', l: 'Hora (se aplicável)', t: 'time' },
+      { k: 'descricao', l: 'Descrição', t: 'textarea', rows: 3 },
+      { k: 'estado', l: 'Estado', t: 'select', o: OPT.marco, def: 'por confirmar', req: 1, badge: 1, quick: 1 }
+    ],
+    filters: ['estado'], summary: 'estado', sort: cmpMarco
+  },
+  dev: {
+    col: 'dev', nome: 'Desenvolvimento', tit: 'componente', novo: 'Novo registo técnico', um: 'registo técnico',
+    intro: 'Diário da evolução técnica da solução da parceira: componentes, problemas, correções e testes.',
+    vazio: 'Ainda não há registos técnicos. Use «Novo registo técnico» quando começar a desenvolver.',
+    fields: [
+      { k: 'componente', l: 'Funcionalidade ou componente', t: 'text', req: 1 },
+      { k: 'descricao', l: 'Descrição', t: 'textarea', rows: 3 },
+      { k: 'estado', l: 'Estado', t: 'select', o: OPT.dev, def: 'por iniciar', req: 1, badge: 1, quick: 1 },
+      { k: 'problema', l: 'Problema identificado', t: 'textarea', rows: 2 },
+      { k: 'solucao', l: 'Solução ou correção aplicada', t: 'textarea', rows: 2 },
+      { k: 'data', l: 'Data', t: 'date', def: today },
+      { k: 'teste', l: 'Resultado do teste', t: 'select', o: OPT.teste, def: 'não testado', req: 1, badge: 1, pre: 'Teste: ' },
+      { k: 'observacoes', l: 'Observações', t: 'textarea', rows: 2 }
+    ],
+    filters: ['estado', 'teste'], summary: 'estado',
+    sort: function (a, b) { return byCriado(b, a); }
+  },
+  entrega: {
+    col: 'entrega', nome: 'Entrega final', tit: 'texto', novo: 'Novo item', um: 'item',
+    fields: [
+      { k: 'texto', l: 'Item da checklist', t: 'text', req: 1 },
+      { k: 'observacoes', l: 'Observações', t: 'textarea', rows: 3 }
+    ],
+    extra: { concluido: false }
+  }
+};
+
+function cmpMarco(a, b) {
+  var ka = (a.data || '9999') + ' ' + (a.hora || '00:00'), kb = (b.data || '9999') + ' ' + (b.hora || '00:00');
+  return ka < kb ? -1 : ka > kb ? 1 : byCriado(a, b);
+}
+function fieldOf(sec, k) { return sec.fields.filter(function (f) { return f.k === k; })[0]; }
+function optsOf(f) { return typeof f.o === 'function' ? f.o() : f.o; }
+
+var BC = {
+  'confirmado': 'ok', 'confirmada': 'ok', 'concluído': 'ok', 'concluída': 'ok', 'respondida': 'ok', 'passou': 'ok',
+  'por validar': 'warn', 'por confirmar': 'warn', 'requer esclarecimento': 'warn', 'proposta': 'warn', 'parcial': 'warn', 'reagendado': 'warn',
+  'em curso': 'info', 'em desenvolvimento': 'info',
+  'bloqueada': 'bad', 'bloqueado': 'bad', 'falhou': 'bad', 'excluído': 'bad',
+  'alta': 'hi'
+};
+function bc(v) { return BC[v] || ''; }
+
+/* =====================================================================
+   6. FEEDBACK AO UTILIZADOR
+   ===================================================================== */
+var toastTimer = null;
+function toast(msg, bad) {
+  var t = $('#toast');
+  t.textContent = msg; t.className = 'toast' + (bad ? ' bad' : ''); t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { t.hidden = true; }, bad ? 7000 : 3500);
+}
+// Interpreta o resultado de uma gravação. Devolve true se a alteração ficou aplicada.
+function report(r, msgOk) {
+  if (r === 'ok') { toast(msgOk); return true; }
+  if (r === 'temp') { toast('Alteração feita só nesta sessão. NÃO foi guardada: o armazenamento local não está disponível.', true); return true; }
+  toast('Não foi possível guardar (o armazenamento pode estar cheio). Nada foi alterado.', true);
+  return false;
+}
+
+/* =====================================================================
+   7. FORMULÁRIO EM JANELA
+   ===================================================================== */
+var formCfg = null;
+
+function fieldHtml(f, val) {
+  var id = 'f_' + f.k, req = f.req ? ' required' : '', inner;
+  if (f.t === 'textarea') {
+    inner = '<textarea id="' + id + '" name="' + f.k + '" rows="' + (f.rows || 3) + '"' + req + '>' + esc(val) + '</textarea>';
+  } else if (f.t === 'select') {
+    var o = optsOf(f).slice();
+    if (val && o.indexOf(val) < 0) o.push(val);
+    inner = '<select id="' + id + '" name="' + f.k + '"' + req + '>' + (f.req ? '' : '<option value="">—</option>') +
+      o.map(function (x) { return '<option value="' + esc(x) + '"' + (x === val ? ' selected' : '') + '>' + esc(cap(x)) + '</option>'; }).join('') + '</select>';
+  } else {
+    inner = '<input id="' + id + '" name="' + f.k + '" type="' + (f.t || 'text') + '" value="' + esc(val) + '"' + req + '>';
+  }
+  return '<label class="fld" for="' + id + '"><span>' + esc(f.l) + (f.req ? ' *' : '') + '</span>' + inner + '</label>';
+}
+
+function openForm(cfg) {
+  formCfg = cfg;
+  $('#mTitle').textContent = cfg.titulo;
+  $('#mBody').innerHTML = cfg.bodyHtml || cfg.fields.map(function (f) {
+    return fieldHtml(f, cfg.values[f.k] != null ? cfg.values[f.k] : '');
+  }).join('');
+  $('#modal').hidden = false;
+  document.body.classList.add('lock');
+  if (window.matchMedia && matchMedia('(pointer:fine)').matches) {
+    var first = $('#mBody input,#mBody textarea,#mBody select');
+    if (first) first.focus();
+  }
+}
+function closeForm() {
+  $('#modal').hidden = true;
+  document.body.classList.remove('lock');
+  formCfg = null;
+}
+
+function submitForm(ev) {
+  ev.preventDefault();
+  if (!formCfg) return;
+  var vals;
+  if (formCfg.collect) {
+    vals = formCfg.collect();
+  } else {
+    var fd = new FormData($('#mForm'));
+    vals = {};
+    for (var i = 0; i < formCfg.fields.length; i++) {
+      var f = formCfg.fields[i], v = fd.get(f.k);
+      v = v == null ? '' : String(v).trim();
+      if (f.req && !v) { toast('Preencha o campo «' + f.l + '».', true); return; }
+      vals[f.k] = v;
+    }
+  }
+  if (formCfg.onSave(vals)) closeForm();
+}
+
+function openItemForm(key, id, pre) {
+  var sec = SEC[key], ex = id ? Store.get(sec.col, id) : null;
+  if (id && !ex) { toast('Registo não encontrado.', true); return; }
+  var vals = {};
+  sec.fields.forEach(function (f) {
+    var v;
+    if (ex) v = ex[f.k];
+    else if (pre && pre[f.k] != null) v = pre[f.k];
+    else v = typeof f.def === 'function' ? f.def() : f.def;
+    vals[f.k] = v == null ? '' : v;
+  });
+  openForm({
+    titulo: ex ? 'Editar ' + sec.um : sec.novo, fields: sec.fields, values: vals,
+    onSave: function (v) {
+      var r = ex ? Store.update(sec.col, id, v) : Store.add(sec.col, Object.assign({}, sec.extra || {}, v));
+      var ok = report(r, ex ? 'Alterações guardadas.' : 'Registo criado.');
+      if (ok) render();
+      return ok;
+    }
+  });
+}
+
+function deleteItem(key, id) {
+  var sec = SEC[key], it = Store.get(sec.col, id);
+  if (!it) return;
+  if (!window.confirm('Eliminar «' + (it[sec.tit] || 'este registo') + '»? Esta ação não pode ser desfeita.')) return;
+  if (report(Store.remove(sec.col, id), 'Registo eliminado.')) render();
+}
+
+/* ---- Gestão das categorias ---- */
+function catRow(old, name) {
+  return '<div class="catrow"><input type="text" value="' + esc(name) + '" data-old="' + esc(old) + '" aria-label="Nome da categoria">' +
+    '<button type="button" class="btn sm danger" data-act="catDel">Remover</button></div>';
+}
+function openCats() {
+  openForm({
+    titulo: 'Categorias',
+    bodyHtml: '<p class="muted small">Usadas no Briefing e nos Requisitos. Ao mudar o nome, os registos existentes acompanham a alteração. Não é possível remover uma categoria em uso.</p>' +
+      '<div id="catRows">' + Store.data.categorias.map(function (c) { return catRow(c, c); }).join('') + '</div>' +
+      '<button type="button" class="btn sm" data-act="catAdd">Adicionar categoria</button>',
+    collect: function () {
+      return Array.prototype.map.call(document.querySelectorAll('#catRows input'), function (i) {
+        return { old: i.getAttribute('data-old'), name: i.value.trim() };
+      });
+    },
+    onSave: function (rows) {
+      var names = [], map = {}, i, r;
+      for (i = 0; i < rows.length; i++) {
+        r = rows[i];
+        if (!r.name) {
+          if (r.old) {
+            var emUso = Store.data.briefing.concat(Store.data.requisitos).some(function (x) { return x.categoria === r.old; });
+            if (emUso) { toast('A categoria «' + r.old + '» está em uso e não pode ser removida.', true); return false; }
+          }
+          continue;
+        }
+        if (names.indexOf(r.name) >= 0) { toast('Há categorias repetidas: «' + r.name + '».', true); return false; }
+        names.push(r.name);
+        if (r.old && r.old !== r.name) map[r.old] = r.name;
+      }
+      var res = Store.commit(function (d) {
+        d.categorias = names;
+        ['briefing', 'requisitos'].forEach(function (c) {
+          d[c].forEach(function (x) { if (map[x.categoria]) x.categoria = map[x.categoria]; });
+        });
+      });
+      var ok = report(res, 'Categorias guardadas.');
+      if (ok) render();
+      return ok;
+    }
+  });
+}
+
+/* ---- Dados do projeto ---- */
+var PF = [
+  { k: 'nome', l: 'Nome do projeto', t: 'text', req: 1 },
+  { k: 'organizacao', l: 'Organização parceira', t: 'text' },
+  { k: 'formacao', l: 'Formação', t: 'text' },
+  { k: 'tipo', l: 'Tipo de projeto', t: 'text' },
+  { k: 'interlocutora', l: 'Interlocutora', t: 'text' },
+  { k: 'contacto', l: 'Contacto da interlocutora', t: 'text' },
+  { k: 'consultora', l: 'Consultora', t: 'text' },
+  { k: 'emailConsultora', l: 'Email da consultora', t: 'email' },
+  { k: 'descricao', l: 'Descrição do desafio', t: 'textarea', rows: 8 }
+];
+function openProjeto() {
+  openForm({
+    titulo: 'Dados do projeto', fields: PF, values: Store.data.projeto,
+    onSave: function (v) {
+      var ok = report(Store.commit(function (d) { Object.assign(d.projeto, v); }), 'Dados do projeto guardados.');
+      if (ok) render();
+      return ok;
+    }
+  });
+}
+
+/* =====================================================================
+   8. VISTAS
+   ===================================================================== */
+var FLT = {};   // filtros ativos por secção
+var VIEWS = {};
+var NAV = [
+  ['painel', 'Painel'], ['briefing', 'Briefing'], ['requisitos', 'Requisitos'], ['tarefas', 'Tarefas'],
+  ['decisoes', 'Decisões'], ['marcos', 'Calendário'], ['dev', 'Desenvolvimento'], ['entrega', 'Entrega'], ['dados', 'Cópia de segurança']
+];
+
+function badgeHtml(f, v) {
+  return '<span class="badge ' + bc(v) + '" title="' + esc(f.l) + '">' + esc((f.pre || '') + (f.pre ? v : cap(v))) + '</span>';
+}
+
+function cardHtml(key, it) {
+  var sec = SEC[key], F = sec.fields, est = fieldOf(sec, 'estado');
+  var late = key === 'tarefas' && it.dataLimite && it.dataLimite < today() && it.estado !== 'concluída';
+  var badges = F.filter(function (f) { return f.badge && it[f.k]; }).map(function (f) { return badgeHtml(f, it[f.k]); }).join('');
+  var lines = F.filter(function (f) { return f.k !== sec.tit && !f.badge && it[f.k]; }).map(function (f) {
+    var v = f.t === 'date' ? fmtDate(it[f.k]) : it[f.k];
+    var cls = (f.k === 'dataLimite' && late) ? ' late' : '';
+    return '<div class="ln"><b>' + esc(f.l) + '</b><span class="v' + cls + '">' + esc(v) + (cls ? ' (em atraso)' : '') + '</span></div>';
+  }).join('');
+  var quick = '';
+  if (est && est.quick) {
+    quick = '<select class="qs" data-act="quick" data-sec="' + key + '" data-id="' + esc(it.id) + '" aria-label="Alterar estado">' +
+      optsOf(est).map(function (o) { return '<option value="' + esc(o) + '"' + (o === it.estado ? ' selected' : '') + '>' + esc(cap(o)) + '</option>'; }).join('') + '</select>';
+  }
+  var concluir = (key === 'tarefas' && it.estado !== 'concluída')
+    ? '<button class="btn sm pri" data-act="concluir" data-id="' + esc(it.id) + '">Concluir</button>' : '';
+  return '<article class="card item ' + bc(it.estado) + '">' +
+    '<h3>' + esc(it[sec.tit] || '(sem título)') + '</h3>' +
+    (badges ? '<div class="badges">' + badges + '</div>' : '') + lines +
+    '<div class="actions">' + concluir + quick +
+    '<button class="btn sm" data-act="edit" data-sec="' + key + '" data-id="' + esc(it.id) + '">Editar</button>' +
+    '<button class="btn sm danger" data-act="del" data-sec="' + key + '" data-id="' + esc(it.id) + '">Eliminar</button></div></article>';
+}
+
+function viewSec(key) {
+  var sec = SEC[key], all = Store.list(sec.col), fl = FLT[key] || (FLT[key] = {});
+  var items = all.filter(function (x) {
+    return Object.keys(fl).every(function (k) { return !fl[k] || x[k] === fl[k]; });
+  }).sort(sec.sort);
+  var filtrado = Object.keys(fl).some(function (k) { return fl[k]; });
+
+  var html = '<div class="head"><h2>' + esc(sec.nome) + '</h2><div class="row">' +
+    (key === 'briefing' ? '<button class="btn" data-act="cats">Categorias</button>' : '') +
+    '<button class="btn pri" data-act="novo" data-sec="' + key + '">' + esc(sec.novo) + '</button></div></div>' +
+    '<p class="muted">' + esc(sec.intro) + '</p>';
+
+  if (sec.summary) {
+    var sf = fieldOf(sec, sec.summary);
+    html += '<div class="chips" role="group" aria-label="Resumo por ' + esc(sf.l.toLowerCase()) + '">' + optsOf(sf).map(function (o) {
+      var n = all.filter(function (x) { return x[sec.summary] === o; }).length;
+      return '<button class="chip" data-act="chip" data-sec="' + key + '" data-k="' + sec.summary + '" data-v="' + esc(o) + '" aria-pressed="' + (fl[sec.summary] === o) + '">' + esc(cap(o)) + ': ' + n + '</button>';
+    }).join('') + '</div>';
+  }
+
+  html += '<div class="filters">' + sec.filters.map(function (k) {
+    var f = fieldOf(sec, k), o = optsOf(f).slice();
+    if (fl[k] && o.indexOf(fl[k]) < 0) o.push(fl[k]);
+    return '<label>' + esc(f.l) + '<select data-act="filter" data-sec="' + key + '" data-k="' + k + '"><option value="">Todos</option>' +
+      o.map(function (x) { return '<option value="' + esc(x) + '"' + (fl[k] === x ? ' selected' : '') + '>' + esc(cap(x)) + '</option>'; }).join('') + '</select></label>';
+  }).join('') + (filtrado ? '<div><button class="btn sm" data-act="limpar" data-sec="' + key + '">Limpar filtros</button></div>' : '') + '</div>';
+
+  if (!all.length) html += '<div class="empty">' + esc(sec.vazio) + '</div>';
+  else if (!items.length) html += '<div class="empty">Nenhum registo corresponde aos filtros escolhidos.</div>';
+  else {
+    html += '<p class="muted small">' + items.length + ' ' + plural(items.length, 'registo', 'registos') + (filtrado ? ' (de ' + all.length + ')' : '') + '</p>' +
+      items.map(function (it) { return cardHtml(key, it); }).join('');
+  }
+  return html;
+}
+
+VIEWS.briefing = function () { return viewSec('briefing'); };
+VIEWS.requisitos = function () { return viewSec('requisitos'); };
+VIEWS.tarefas = function () { return viewSec('tarefas'); };
+VIEWS.decisoes = function () { return viewSec('decisoes'); };
+VIEWS.marcos = function () { return viewSec('marcos'); };
+VIEWS.dev = function () { return viewSec('dev'); };
+
+VIEWS.entrega = function () {
+  var sec = SEC.entrega, items = Store.list('entrega').slice().sort(byCriado);
+  var feitos = items.filter(function (x) { return x.concluido; }).length;
+  var pct = items.length ? Math.round(feitos * 100 / items.length) : 0;
+  var html = '<div class="head"><h2>Entrega final</h2><button class="btn pri" data-act="novo" data-sec="entrega">Novo item</button></div>' +
+    '<p class="muted">Checklist de preparação da entrega. Cada item só fica concluído quando o marcar.</p>' +
+    '<p><b>' + feitos + ' de ' + items.length + '</b> ' + plural(feitos, 'item concluído', 'itens concluídos') + '</p>' +
+    '<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pct + '"><i style="width:' + pct + '%"></i></div>';
+  if (!items.length) return html + '<div class="empty">A checklist está vazia. Use «Novo item» para acrescentar o primeiro.</div>';
+  return html + items.map(function (it) {
+    return '<article class="card"><div class="check' + (it.concluido ? ' done' : '') + '">' +
+      '<input type="checkbox" data-act="toggle" data-id="' + esc(it.id) + '"' + (it.concluido ? ' checked' : '') + ' aria-label="Concluído: ' + esc(it.texto) + '">' +
+      '<div style="flex:1;min-width:0"><div class="t">' + esc(it.texto) + '</div>' +
+      (it.observacoes ? '<div class="ln"><b>Observações</b><span class="v">' + esc(it.observacoes) + '</span></div>' : '') +
+      '<div class="actions"><button class="btn sm" data-act="edit" data-sec="entrega" data-id="' + esc(it.id) + '">Editar</button>' +
+      '<button class="btn sm danger" data-act="del" data-sec="entrega" data-id="' + esc(it.id) + '">Eliminar</button></div></div></div></article>';
+  }).join('');
+};
+
+VIEWS.painel = function () {
+  var d = Store.data, p = d.projeto, t0 = today();
+  var pend = d.tarefas.filter(function (x) { return x.estado !== 'concluída'; }).length;
+  var done = d.tarefas.length - pend;
+  var porValidar = d.requisitos.filter(function (x) { return x.estado === 'por validar'; }).length;
+  var prox = d.marcos.filter(function (m) { return m.estado !== 'concluído' && m.data && m.data >= t0; }).sort(cmpMarco)[0];
+  var ultimas = d.decisoes.slice().sort(function (a, b) { return (b.criado || 0) - (a.criado || 0); }).slice(0, 5);
+  var nuncaExportou = !d.meta.ultimaExportacao;
+
+  var html = '<h2>' + esc(p.nome) + '</h2><p class="muted">' + esc(p.organizacao) + '</p>';
+
+  html += '<div class="stats">' +
+    '<div class="stat"><b>' + pend + '</b><span>' + plural(pend, 'tarefa pendente', 'tarefas pendentes') + '</span></div>' +
+    '<div class="stat"><b>' + done + '</b><span>' + plural(done, 'tarefa concluída', 'tarefas concluídas') + '</span></div>' +
+    '<div class="stat"><b>' + porValidar + '</b><span>' + plural(porValidar, 'requisito por validar', 'requisitos por validar') + '</span></div></div>';
+
+  html += '<div class="card"><h3>Próxima data relevante</h3>' + (prox
+    ? '<p><b>' + esc(prox.nome) + '</b><br>' + esc(fmtDate(prox.data)) + (prox.hora ? ' às ' + esc(prox.hora) : '') +
+      ' <span class="badge ' + bc(prox.estado) + '">' + esc(cap(prox.estado)) + '</span></p>'
+    : '<p class="muted">Não há datas futuras por concluir no calendário.</p>') +
+    '<a href="#marcos">Ver calendário</a></div>';
+
+  html += '<div class="card"><h3>Atalhos</h3><div class="row" style="margin-top:.5rem">' +
+    '<button class="btn pri" data-act="atalho" data-w="tarefa">Nova tarefa</button>' +
+    '<button class="btn" data-act="atalho" data-w="resposta">Registar resposta</button>' +
+    '<button class="btn" data-act="atalho" data-w="nota">Adicionar nota</button></div></div>';
+
+  html += '<div class="card"><h3>Últimas decisões e notas</h3>' + (ultimas.length
+    ? ultimas.map(function (x) {
+        return '<p><b>' + esc(x.titulo) + '</b> <span class="badge ' + bc(x.estado) + '">' + esc(cap(x.estado)) + '</span>' +
+          (x.data ? '<br><span class="muted small">' + esc(fmtDate(x.data)) + '</span>' : '') + '</p>';
+      }).join('') + '<a href="#decisoes">Ver todas</a>'
+    : '<p class="muted">Ainda não há decisões nem notas registadas.</p>') + '</div>';
+
+  html += '<div class="card"><div class="head"><h3>Dados do projeto</h3><button class="btn sm" data-act="projeto">Editar</button></div>' +
+    '<div class="kv">' +
+    kv('Formação', p.formacao) + kv('Tipo de projeto', p.tipo) + kv('Organização parceira', p.organizacao) +
+    kv('Interlocutora', p.interlocutora) +
+    kv('Contacto', p.contacto, p.contacto ? 'tel:' + String(p.contacto).replace(/[^\d+]/g, '') : '') +
+    kv('Consultora', p.consultora) +
+    kv('Email da consultora', p.emailConsultora, p.emailConsultora ? 'mailto:' + p.emailConsultora : '') + '</div>' +
+    '<details><summary>Descrição do desafio (indicada pela formação)</summary><p style="white-space:pre-wrap">' + esc(p.descricao) + '</p></details>' +
+    '<details><summary>Âmbito geral da formação</summary>' +
+    '<p class="small muted">Descreve o âmbito geral; não significa que tudo seja necessário na solução final.</p>' +
+    '<p><b>Poderá incluir</b></p><ul class="plain"><li>Estruturação de base de dados</li><li>Organização e centralização da informação</li><li>Listagens e páginas de detalhe</li><li>Filtros e categorização</li><li>Criação e edição de registos</li><li>Automações simples, como notificações por email</li><li>Interface simples para consulta e gestão interna</li><li>Sistema básico de permissões e acessos, quando aplicável</li></ul>' +
+    '<p><b>Não está previsto</b></p><ul class="plain"><li>Integrações complexas com ERPs ou softwares internos</li><li>Desenvolvimento com código personalizado</li><li>Integrações avançadas com APIs externas</li><li>Dashboards financeiros altamente personalizados</li><li>Lógicas de backend complexas ou sistemas proprietários</li><li>Desenvolvimento contínuo após o término do projeto</li></ul></details></div>';
+
+  if (nuncaExportou) {
+    html += '<div class="card"><b>Ainda não fez cópia de segurança.</b> <span class="muted">Os dados ficam só neste navegador. Vá a «Cópia de segurança» para exportar.</span></div>';
+  }
+  html += '<p class="muted small">Este caderno é privado e funciona só neste dispositivo. Não registe dados reais ou identificáveis de famílias: use apenas dados fictícios ou anónimos.</p>';
+  return html;
+};
+function kv(l, v, href) {
+  if (!v) return '';
+  var val = href ? '<a href="' + esc(href) + '">' + esc(v) + '</a>' : esc(v);
+  return '<div class="ln"><b>' + esc(l) + '</b><span class="v">' + val + '</span></div>';
+}
+
+VIEWS.dados = function () {
+  var d = Store.data, n = countAll(d);
+  return '<h2>Cópia de segurança</h2>' +
+    '<div class="card"><h3>Onde ficam os dados</h3>' +
+    '<p>Os registos ficam guardados <b>neste navegador, neste dispositivo</b>. Podem perder-se se limpar os dados do navegador ou o histórico do site, e <b>não aparecem</b> noutro computador, telemóvel ou navegador.</p>' +
+    '<p>A exportação é uma <b>cópia de segurança manual</b>, não uma sincronização automática. Exporte regularmente e guarde o ficheiro num local seguro.</p>' +
+    '<p class="small ' + (Store.ok ? 'muted' : 'late') + '">Armazenamento local: ' + (Store.ok ? 'disponível' : 'indisponível — nada está a ser guardado') + '. Registos atuais: ' + n + '.</p>' +
+    '<p class="small muted">Última exportação: ' + (d.meta.ultimaExportacao ? esc(fmtStamp(d.meta.ultimaExportacao)) : 'nunca') + '.</p></div>' +
+    '<div class="card"><h3>Exportar</h3><p class="muted">Descarrega todos os registos num ficheiro JSON. Nada é enviado para a internet.</p>' +
+    '<button class="btn pri" data-act="exportar">Exportar dados (JSON)</button></div>' +
+    '<div class="card"><h3>Importar</h3><p class="muted">Restaura uma cópia exportada antes. O ficheiro é verificado e, se estiver correto, pede confirmação antes de <b>substituir todos os registos atuais</b>.</p>' +
+    '<button class="btn" data-act="importar">Importar cópia (JSON)</button></div>';
+};
+
+/* =====================================================================
+   9. EXPORTAÇÃO E IMPORTAÇÃO
+   ===================================================================== */
+function exportar() {
+  try {
+    var payload = { app: 'caderno-projeto', versao: 1, exportadoEm: new Date().toISOString(), dados: Store.data };
+    var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'caderno-projeto-' + today() + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  } catch (e) {
+    toast('Não foi possível gerar o ficheiro de exportação.', true);
+    return;
+  }
+  Store.commit(function (d) { d.meta.ultimaExportacao = new Date().toISOString(); });
+  toast('Ficheiro preparado. Confirme que ficou guardado no dispositivo.');
+  if (route === 'dados' || route === 'painel') render();
+}
+
+function importar(file) {
+  if (!file) return;
+  var rd = new FileReader();
+  rd.onerror = function () { toast('Não foi possível ler o ficheiro.', true); };
+  rd.onload = function () {
+    var p;
+    try { p = JSON.parse(String(rd.result)); } catch (e) { toast('O ficheiro não é um JSON válido. Nada foi alterado.', true); return; }
+    var err = validate(p);
+    if (err) { toast(err + ' Nada foi alterado.', true); return; }
+    var novos = countAll(p.dados), atuais = countAll(Store.data);
+    var quando = p.exportadoEm ? fmtStamp(p.exportadoEm) : 'data desconhecida';
+    var msg = 'Vai SUBSTITUIR todos os registos atuais (' + atuais + ') pelos da cópia (' + novos + ', exportada em ' + quando + ').\n\nEsta ação não pode ser desfeita. Se tiver dúvidas, cancele e exporte primeiro os dados atuais.\n\nContinuar?';
+    if (!window.confirm(msg)) { toast('Importação cancelada. Nada foi alterado.'); return; }
+    var novo = normalize(p.dados);
+    var r = Store.commit(function (d) {
+      Object.keys(d).forEach(function (k) { delete d[k]; });
+      Object.assign(d, novo);
+    });
+    if (report(r, 'Cópia importada com sucesso.')) render();
+  };
+  rd.readAsText(file);
+}
+
+/* =====================================================================
+   10. RENDERIZAÇÃO E EVENTOS
+   ===================================================================== */
+var route = 'painel';
+
+function render() {
+  var h = (location.hash || '#painel').slice(1);
+  route = VIEWS[h] ? h : 'painel';
+  $('#nav').innerHTML = NAV.map(function (n) {
+    return '<a href="#' + n[0] + '"' + (n[0] === route ? ' aria-current="page"' : '') + '>' + esc(n[1]) + '</a>';
+  }).join('');
+  var b = '';
+  if (!Store.ok) b += '<div class="banner bad"><b>O armazenamento local não está disponível</b> (pode estar bloqueado ou em modo privado). Pode usar o caderno, mas <b>nada fica guardado</b> ao fechar ou atualizar a página. Use «Cópia de segurança» para exportar o que registar.</div>';
+  if (Store.loadMsg) b += '<div class="banner">' + esc(Store.loadMsg) + '</div>';
+  $('#banner').innerHTML = b;
+  $('#view').innerHTML = VIEWS[route]();
+  var cur = $('#nav [aria-current]');
+  if (cur && cur.scrollIntoView) { try { cur.scrollIntoView({ block: 'nearest', inline: 'center' }); } catch (e) { /* ignorar */ } }
+}
+
+document.addEventListener('click', function (ev) {
+  var el = ev.target.closest('[data-act]');
+  if (!el || el.tagName === 'SELECT' || el.type === 'checkbox') return;
+  var act = el.getAttribute('data-act'), key = el.getAttribute('data-sec'), id = el.getAttribute('data-id');
+  switch (act) {
+    case 'close': closeForm(); break;
+    case 'novo': openItemForm(key); break;
+    case 'edit': openItemForm(key, id); break;
+    case 'del': deleteItem(key, id); break;
+    case 'concluir':
+      if (report(Store.update('tarefas', id, { estado: 'concluída' }), 'Tarefa concluída.')) render();
+      break;
+    case 'chip':
+      var k = el.getAttribute('data-k'), v = el.getAttribute('data-v');
+      FLT[key] = FLT[key] || {};
+      FLT[key][k] = FLT[key][k] === v ? '' : v;
+      render(); break;
+    case 'limpar': FLT[key] = {}; render(); break;
+    case 'cats': openCats(); break;
+    case 'catAdd':
+      var rows = $('#catRows');
+      if (rows) { rows.insertAdjacentHTML('beforeend', catRow('', '')); var inp = rows.lastElementChild.querySelector('input'); if (inp) inp.focus(); }
+      break;
+    case 'catDel':
+      var row = el.closest('.catrow'), i2 = row.querySelector('input');
+      if (i2.getAttribute('data-old')) { i2.value = ''; row.hidden = true; } else row.remove();
+      break;
+    case 'projeto': openProjeto(); break;
+    case 'atalho':
+      var w = el.getAttribute('data-w');
+      if (w === 'tarefa') openItemForm('tarefas');
+      else if (w === 'resposta') openItemForm('briefing', null, { estado: 'respondida' });
+      else openItemForm('decisoes');
+      break;
+    case 'exportar': exportar(); break;
+    case 'importar': $('#fileImp').click(); break;
+  }
+});
+
+document.addEventListener('change', function (ev) {
+  var el = ev.target;
+  if (el.id === 'fileImp') { importar(el.files && el.files[0]); el.value = ''; return; }
+  var act = el.getAttribute && el.getAttribute('data-act');
+  if (!act) return;
+  var key = el.getAttribute('data-sec'), id = el.getAttribute('data-id');
+  if (act === 'quick') {
+    if (report(Store.update(SEC[key].col, id, { estado: el.value }), 'Estado atualizado.')) render();
+  } else if (act === 'toggle') {
+    if (report(Store.update('entrega', id, { concluido: el.checked }), el.checked ? 'Item concluído.' : 'Item reaberto.')) render();
+    else render();
+  } else if (act === 'filter') {
+    FLT[key] = FLT[key] || {};
+    FLT[key][el.getAttribute('data-k')] = el.value;
+    render();
+  }
+});
+
+$('#mForm').addEventListener('submit', submitForm);
+document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && !$('#modal').hidden) closeForm(); });
+window.addEventListener('hashchange', function () { window.scrollTo(0, 0); render(); });
+
+/* =====================================================================
+   11. ARRANQUE
+   ===================================================================== */
+Store.init();
+render();
+
+})();
+</script>
+</body>
+</html>
