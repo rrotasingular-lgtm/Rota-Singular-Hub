@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Rota Singular | Hub</title>
+<meta name="description" content="Transformando ideias em projetos com método." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='38' cy='34' r='26' fill='%236E93C7' opacity='.85'/%3E%3Ccircle cx='64' cy='38' r='24' fill='%23D9A93A' opacity='.8'/%3E%3Ccircle cx='42' cy='62' r='24' fill='%239A7FC7' opacity='.8'/%3E%3Ccircle cx='66' cy='64' r='24' fill='%23D3616C' opacity='.8'/%3E%3C/svg%3E" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Caveat:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --font-body:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --font-display:'Baloo 2','Segoe UI',sans-serif;
+    --font-script:'Caveat',cursive;
+    --blue:#6E93C7; --yellow:#D9A93A; --coral:#D3616C; --purple:#9A7FC7; --green:#3D5A56;
+    --bg:#F7F6F1; --surface:#FFFFFF; --surfaceAlt:#F0EEE5; --surfaceHover:#EAE7DC;
+    --border:#E3E0D4; --text:#2B3634; --textMuted:#767F78; --textFaint:#9BA39D;
+    --shadow:0 1px 2px rgba(43,54,52,.06),0 8px 24px rgba(43,54,52,.06);
+    --overlay:rgba(30,36,34,.45);
+    --danger:#C1595F;
+    --radius:16px;
+  }
+  [data-theme="dark"]{
+    --blue:#87A8D6; --yellow:#E8C15E; --coral:#E1808A; --purple:#B79FD9; --green:#6FA79E;
+    --bg:#1B2220; --surface:#232C29; --surfaceAlt:#2A3330; --surfaceHover:#323C38;
+    --border:#39423F; --text:#EDEAE1; --textMuted:#9CA79F; --textFaint:#6C7873;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+    --overlay:rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:var(--bg); color:var(--text); font-family:var(--font-body);
+    transition:background .25s ease,color .25s ease; -webkit-font-smoothing:antialiased;
+  }
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px;}
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;cursor:pointer;}
+  input,textarea,select{font-family:inherit;}
+  h1,h2,h3{margin:0;}
+  .hidden{display:none !important;}
+  .fadein{animation:fadein .18s ease-out;}
+  .slideup{animation:slideup .22s ease-out;}
+  .slidein{animation:slidein .25s ease-out;}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  @keyframes slideup{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes slidein{from{transform:translateX(-16px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+  .app{display:flex;min-height:100vh;}
+  .icon{display:inline-flex;flex-shrink:0;}
+  .icon svg{display:block;}
+
+  /* Sidebar */
+  .sidebar{width:264px;flex-shrink:0;height:100vh;position:sticky;top:0;padding:20px 16px;border-right:1px solid var(--border);
+    display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
+  .brand{display:flex;align-items:center;gap:10px;padding:8px;margin-bottom:14px;}
+  .brand-name{font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--text);line-height:1.2;}
+  .brand-sub{font-size:11px;color:var(--textFaint);line-height:1.2;}
+  .navitem{display:flex;align-items:center;gap:10px;border-radius:12px;padding:10px 12px;font-size:14px;font-weight:500;
+    color:var(--textMuted);background:transparent;border:none;width:100%;text-align:left;transition:background .15s,color .15s;}
+  .navitem:hover{background:var(--surfaceAlt);}
+  .navitem.active{background:var(--surfaceHover);color:var(--text);}
+  .side-label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--textFaint);
+    padding:0 12px;margin:16px 0 4px;display:flex;align-items:center;justify-content:space-between;}
+  .side-label button{background:none;border:none;color:var(--textFaint);padding:2px;}
+  .proj-list{max-height:32vh;overflow-y:auto;display:flex;flex-direction:column;gap:1px;}
+  .proj-item{display:flex;align-items:center;gap:9px;border-radius:12px;padding:8px 12px;font-size:14px;color:var(--textMuted);
+    background:transparent;border:none;width:100%;text-align:left;}
+  .proj-item:hover{background:var(--surfaceAlt);}
+  .proj-item.active{background:var(--surfaceHover);color:var(--text);}
+  .proj-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .proj-item .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+  .sidebar-footer{margin-top:auto;padding-top:14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:2px;}
+  .theme-toggle{display:flex;align-items:center;gap:10px;border-radius:12px;padding:10px 12px;font-size:14px;font-weight:500;
+    color:var(--textMuted);background:transparent;border:none;width:100%;text-align:left;}
+  .theme-toggle:hover{background:var(--surfaceAlt);}
+  .backup-row{display:flex;gap:6px;padding:4px 2px 0;}
+  .backup-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:10px;padding:8px;font-size:11px;
+    color:var(--textFaint);background:var(--surfaceAlt);border:none;}
+
+  /* Mobile drawer */
+  .drawer-overlay{position:fixed;inset:0;background:var(--overlay);z-index:50;display:none;}
+  .drawer-overlay.open{display:block;}
+  .drawer{width:280px;height:100%;background:var(--bg);border-right:1px solid var(--border);padding:20px 16px;
+    display:flex;flex-direction:column;gap:2px;overflow-y:auto;}
+
+  /* Topbar */
+  .main-col{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:12px;padding:12px 16px;
+    background:color-mix(in srgb, var(--bg) 92%, transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--border);}
+  .hamburger{display:none;background:none;border:none;color:var(--text);padding:8px;border-radius:10px;}
+  .search-wrap{position:relative;flex:1;max-width:420px;}
+  .search-wrap .icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--textFaint);}
+  .search-input{width:100%;border-radius:12px;padding:9px 12px 9px 34px;font-size:14px;background:var(--surfaceAlt);
+    border:1px solid var(--border);color:var(--text);outline:none;}
+  .search-results{position:absolute;margin-top:8px;width:100%;border-radius:16px;overflow:hidden;z-index:40;
+    background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow);max-height:340px;overflow-y:auto;}
+  .search-results button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:10px 14px;font-size:13px;
+    background:none;border:none;color:var(--text);}
+  .search-results button:hover{background:var(--surfaceAlt);}
+  .search-empty{padding:12px 14px;font-size:13px;color:var(--textMuted);}
+  .icon-btn{border:none;background:transparent;border-radius:12px;padding:8px;display:flex;align-items:center;justify-content:center;
+    color:var(--textMuted);transition:background .15s;}
+  .icon-btn:hover{background:var(--surfaceAlt);}
+  .icon-btn.active{background:var(--surfaceHover);color:var(--text);}
+  .icon-btn.danger{color:var(--danger);}
+  .icon-btn.danger:hover{background:rgba(193,89,95,.12);}
+
+  main{flex:1;min-width:0;padding:24px 20px 60px;max-width:1100px;width:100%;margin:0 auto;}
+
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:14px;font-weight:600;font-size:13.5px;
+    padding:10px 16px;border:none;transition:transform .12s;}
+  .btn:active{transform:scale(.98);}
+  .btn.small{padding:8px 12px;font-size:13px;border-radius:12px;}
+  .btn-primary{background:var(--text);color:var(--bg);}
+  .btn-secondary{background:var(--surfaceAlt);color:var(--text);border:1px solid var(--border);}
+  .btn-ghost{background:transparent;color:var(--textMuted);}
+  .btn-danger{background:var(--danger);color:#fff;}
+
+  /* Cards */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow);padding:20px;}
+  .badge{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:500;}
+  .progress-track{width:100%;border-radius:999px;overflow:hidden;background:var(--surfaceAlt);height:8px;}
+  .progress-fill{height:100%;border-radius:999px;transition:width .5s ease;}
+
+  .empty-state{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:56px 20px;}
+  .empty-state .icon-wrap{background:var(--surfaceAlt);border-radius:16px;padding:12px;margin-bottom:4px;}
+  .empty-title{font-weight:600;color:var(--text);font-size:14px;}
+  .empty-sub{font-size:13px;color:var(--textMuted);max-width:280px;}
+
+  /* Forms */
+  .field{display:flex;flex-direction:column;gap:6px;font-size:13.5px;margin-bottom:14px;}
+  .field label{font-weight:600;color:var(--text);}
+  .field .hint{font-size:11.5px;color:var(--textFaint);}
+  .input,.textarea,.select{border-radius:12px;padding:9px 12px;font-size:13.5px;background:var(--surfaceAlt);
+    border:1px solid var(--border);color:var(--text);outline:none;width:100%;}
+  .textarea{resize:vertical;min-height:60px;}
+  .input:focus,.textarea:focus,.select:focus{border-color:var(--text);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  /* Modal */
+  .modal-overlay{position:fixed;inset:0;background:var(--overlay);z-index:60;display:flex;align-items:flex-end;justify-content:center;padding:0;}
+  .modal{width:100%;max-width:460px;max-height:92vh;overflow-y:auto;background:var(--surface);border-radius:24px 24px 0 0;padding:22px;}
+  .modal.wide{max-width:620px;}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .modal-head h3{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text);}
+  @media (min-width:640px){
+    .modal-overlay{align-items:center;padding:24px;}
+    .modal{border-radius:24px;}
+  }
+
+  /* Dashboard */
+  .greeting{font-family:var(--font-script);font-weight:600;font-size:40px;line-height:1;color:var(--text);}
+  .today-label{font-size:13px;color:var(--textMuted);margin-top:8px;text-transform:capitalize;}
+  .grid2{display:grid;grid-template-columns:2fr 1fr;gap:16px;}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .grid2-eq{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .grid-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media (max-width:900px){.grid2,.grid2-eq{grid-template-columns:1fr;} .grid-cards{grid-template-columns:1fr 1fr;} .grid4{grid-template-columns:1fr 1fr;}}
+  @media (max-width:560px){.grid-cards{grid-template-columns:1fr;} .grid4{grid-template-columns:1fr 1fr;}}
+
+  .stat-card{display:flex;flex-direction:column;gap:8px;padding:16px;}
+  .stat-icon{width:fit-content;border-radius:12px;padding:8px;}
+  .stat-value{font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--text);}
+  .stat-label{font-size:12px;color:var(--textMuted);}
+
+  .list-row{display:flex;align-items:center;justify-content:space-between;font-size:13.5px;border-radius:12px;padding:9px 10px;margin:0 -6px;transition:background .15s;background:none;border:none;width:calc(100% + 12px);text-align:left;}
+  .list-row:hover{background:var(--surfaceAlt);}
+
+  .filters-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .chip-toggle{border-radius:12px;padding:8px 12px;font-size:13px;background:var(--surfaceAlt);border:1px solid var(--border);
+    color:var(--textMuted);display:flex;align-items:center;gap:6px;}
+  .chip-toggle.active{background:var(--surfaceHover);color:var(--text);}
+
+  .proj-card{border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:10px;background:var(--surface);
+    border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:transform .18s;}
+  .proj-card:hover{transform:translateY(-2px);}
+  .proj-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+  .proj-card-title{display:flex;align-items:center;gap:10px;min-width:0;}
+  .proj-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .proj-card-name{font-family:var(--font-display);font-weight:600;color:var(--text);font-size:15px;line-height:1.2;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .proj-card-resp{font-size:11.5px;color:var(--textFaint);}
+  .proj-card-obj{font-size:13px;color:var(--textMuted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .proj-card-next{font-size:12px;border-radius:12px;padding:8px 10px;display:flex;align-items:center;gap:7px;background:var(--surfaceAlt);color:var(--textMuted);}
+  .proj-card-next span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .star-btn{background:none;border:none;opacity:.65;padding:2px;}
+  .star-btn:hover{opacity:1;}
+
+  /* Project page */
+  .proj-header{display:flex;flex-direction:column;gap:14px;padding:22px;}
+  .proj-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+  .proj-header-id{display:flex;align-items:center;gap:12px;min-width:0;}
+  .proj-header-icon{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;}
+  .proj-header-name{font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--text);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .proj-header-obj{font-size:13.5px;color:var(--textMuted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .proj-header-actions{display:flex;align-items:center;gap:2px;flex-shrink:0;}
+  .meta-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;color:var(--textFaint);}
+  .progress-row{display:flex;align-items:center;gap:12px;}
+
+  .tabs{display:flex;align-items:center;gap:2px;overflow-x:auto;border-bottom:1px solid var(--border);margin:22px 0 20px;padding-bottom:1px;}
+  .tab{display:flex;align-items:center;gap:6px;padding:11px 14px;font-size:13.5px;font-weight:600;white-space:nowrap;
+    background:none;border:none;color:var(--textMuted);position:relative;flex-shrink:0;}
+  .tab.active{color:var(--text);}
+  .tab.active::after{content:'';position:absolute;left:8px;right:8px;bottom:-1px;height:2px;border-radius:2px;background:var(--accent,var(--text));}
+
+  .section-title{font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:14px;}
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+
+  .task-row{display:flex;align-items:center;gap:12px;border-radius:16px;padding:12px 14px;background:var(--surface);
+    border:1px solid var(--border);}
+  .task-row .task-actions{display:flex;align-items:center;gap:0;margin-left:auto;flex-shrink:0;}
+  .task-title{font-size:13.5px;color:var(--text);}
+  .task-title.done{color:var(--textFaint);text-decoration:line-through;}
+  .task-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;}
+  .tag-pill{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--surfaceAlt);color:var(--textFaint);}
+
+  .next-hero{border-radius:24px;padding:34px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;}
+  .next-hero-icon{border-radius:16px;padding:12px;}
+  .next-hero-label{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+  .next-hero-title{font-family:var(--font-display);font-size:24px;color:var(--text);max-width:560px;line-height:1.3;}
+
+  .journal-card{border-radius:18px;padding:18px;background:var(--surface);border:1px solid var(--border);}
+  .journal-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .journal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;}
+  @media (max-width:600px){.journal-grid{grid-template-columns:1fr;}}
+  .jf-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--textFaint);margin-bottom:3px;}
+  .jf-value{color:var(--textMuted);}
+
+  .file-card{display:flex;align-items:flex-start;gap:10px;border-radius:16px;padding:14px;background:var(--surface);
+    border:1px solid var(--border);position:relative;}
+  .file-icon{border-radius:12px;padding:8px;flex-shrink:0;}
+  .file-name{font-size:13.5px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .file-url{font-size:11.5px;color:var(--textFaint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .files-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:600px){.files-grid{grid-template-columns:1fr;}}
+
+  .color-dot{width:28px;height:28px;border-radius:50%;border:2px solid transparent;}
+  .color-dot.active{border-color:var(--text);}
+  .icon-pick{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:17px;
+    background:var(--surfaceAlt);border:1px solid var(--border);}
+  .icon-pick.active{background:var(--surfaceHover);}
+
+  .weekly-title{font-family:var(--font-script);font-size:30px;font-weight:600;color:var(--text);}
+  .checklist-item{display:flex;align-items:center;gap:8px;border-radius:12px;padding:8px;}
+  .agenda-item{display:flex;align-items:center;justify-content:space-between;font-size:13.5px;border-radius:12px;padding:9px 12px;background:var(--surfaceAlt);}
+  .inline-add{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);
+    padding:10px 18px;border-radius:14px;font-size:13px;font-weight:500;z-index:80;box-shadow:var(--shadow);}
+
+  @media (max-width:860px){
+    .sidebar{display:none;}
+    .hamburger{display:flex;}
+    .grid2{grid-template-columns:1fr;}
+    main{padding:18px 14px 50px;}
+  }
+  @media print{
+    .no-print{display:none !important;}
+    body{background:#fff;color:#000;}
+    main{max-width:100%;}
+  }
+</style>
+</head>
+<body data-theme="light">
+<div id="root"></div>
+
+<script>
+/* ============================== ICONS ============================== */
+const ICONS = {
+  home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/>',
+  folder:'<path d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6Z"/>',
+  calendar:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/>',
+  star:'<polygon points="12 2.5 15 9.2 22 9.8 16.7 14.4 18.3 21.3 12 17.6 5.7 21.3 7.3 14.4 2 9.8 9 9.2"/>',
+  archive:'<rect x="3" y="4" width="18" height="5" rx="1.4"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4"/>',
+  unarchive:'<rect x="3" y="4" width="18" height="5" rx="1.4"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M9.5 15.5 12 13l2.5 2.5M12 13v5"/>',
+  search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.6-4.6"/>',
+  sun:'<circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/>',
+  moon:'<path d="M20.5 14.5a8.5 8.5 0 1 1-9-11 7 7 0 0 0 9 11Z"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  check:'<polyline points="5 13 10 18 19 7"/>',
+  trash:'<path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-8 0v12a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V7"/>',
+  edit:'<path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5.5 16.5 4 20Z"/>',
+  copy:'<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
+  menu:'<path d="M3 6h18M3 12h18M3 18h18"/>',
+  download:'<path d="M12 3v12m0 0-4.5-4.5M12 15l4.5-4.5"/><path d="M4 18v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1"/>',
+  upload:'<path d="M12 21V9m0 0-4.5 4.5M12 9l4.5 4.5"/><path d="M4 18v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1"/>',
+  paperclip:'<path d="M8 12.5 15.5 5a3.2 3.2 0 0 1 4.5 4.5L11 18.5a5 5 0 1 1-7-7L12.5 3"/>',
+  fileText:'<path d="M6 3h8l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M14 3v4h4M8 13h8M8 17h5"/>',
+  link:'<path d="M9 15 15 9"/><path d="M11 6.5 12.5 5A4 4 0 1 1 18 10.5L16.5 12"/><path d="M13 17.5 11.5 19A4 4 0 1 1 6 13.5L7.5 12"/>',
+  chevronRight:'<polyline points="9 5 16 12 9 19"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/>',
+  alertTriangle:'<path d="M12 3.5 22 20H2Z"/><path d="M12 10v4"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/>',
+  trendingUp:'<polyline points="3 16 10 9 14 13 21 5"/><polyline points="15 5 21 5 21 11"/>',
+  activity:'<polyline points="3 12 8 12 10 6 14 18 16 12 21 12"/>',
+  filter:'<polygon points="4 4 20 4 14 12.5 14 19 10 21 10 12.5"/>',
+  target:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/>',
+  bookOpen:'<path d="M12 6.5c-1.6-1.4-4-2-7-2v13c3 0 5.4.6 7 2 1.6-1.4 4-2 7-2V4.5c-3 0-5.4.6-7 2Z"/><path d="M12 6.5v13"/>',
+  stickyNote:'<path d="M4 4h13l3 3v13H4Z"/><path d="M17 4v3h3"/>',
+  printer:'<path d="M6 9V4h12v5"/><rect x="4" y="9" width="16" height="7" rx="1.5"/><path d="M6 15h12v6H6Z"/>',
+  circle:'<circle cx="12" cy="12" r="8.5"/>',
+  checkCircle:'<circle cx="12" cy="12" r="8.5"/><polyline points="8 12.5 11 15.5 16 9"/>',
+  sparkles:'<path d="M11 3 12.4 8 17 9.4 12.4 10.8 11 16 9.6 10.8 5 9.4 9.6 8Z"/><path d="M18.5 14 19.3 16.5 21.8 17.3 19.3 18.1 18.5 20.5 17.7 18.1 15.3 17.3 17.7 16.5Z"/>',
+  flag:'<path d="M5 3v18"/><path d="M5 4h11l-2 4 2 4H5"/>',
+  compass:'<circle cx="12" cy="12" r="8.5"/><polygon points="15.5 8.5 13.2 13.2 8.5 15.5 10.8 10.8"/>',
+  chevronLeft:'<polyline points="15 5 8 12 15 19"/>',
+  user:'<circle cx="12" cy="8" r="3.3"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/>'
+};
+function icon(name, size){
+  size = size || 17;
+  return '<span class="icon" style="width:'+size+'px;height:'+size+'px"><svg viewBox="0 0 24 24" width="'+size+'" height="'+size+'" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+(ICONS[name]||'')+'</svg></span>';
+}
+
+/* ============================== HELPERS ============================== */
+const uid = () => 'id_' + Math.random().toString(36).slice(2,9) + Date.now().toString(36);
+const todayISO = () => new Date().toISOString().slice(0,10);
+function esc(s){
+  if (s === undefined || s === null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function fmtDate(iso){
+  if (!iso) return '—';
+  const d = new Date(iso + 'T00:00:00');
+  if (isNaN(d)) return '—';
+  return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'short', year:'numeric'});
+}
+function daysUntil(iso){
+  if (!iso) return null;
+  const d = new Date(iso + 'T00:00:00');
+  const now = new Date(todayISO() + 'T00:00:00');
+  return Math.round((d - now) / 86400000);
+}
+function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+function debounce(fn, ms){
+  let tm;
+  return (...args) => { clearTimeout(tm); tm = setTimeout(() => fn(...args), ms); };
+}
+function projectProgress(p){
+  if (!p.tasks || p.tasks.length === 0) return 0;
+  const done = p.tasks.filter(t => t.done).length;
+  return Math.round((done / p.tasks.length) * 100);
+}
+
+const BRAND_KEYS = ['blue','yellow','coral','purple','green'];
+const STATUS_OPTIONS = ['Planejamento','Em andamento','Pausado','Concluído'];
+const PRIORITY_OPTIONS = ['Baixa','Média','Alta'];
+const PRIORITY_WEIGHT = {Alta:3, Média:2, Baixa:1};
+const STATUS_TONE = {'Planejamento':'blue','Em andamento':'coral','Pausado':'yellow','Concluído':'green'};
+const PRIORITY_TONE = p => p === 'Alta' ? 'coral' : p === 'Média' ? 'yellow' : 'green';
+function tone(name){ return 'var(--' + name + ')'; }
+
+const TABS = [
+  {key:'overview', label:'Visão Geral', icon:'home'},
+  {key:'next', label:'Próxima Ação', icon:'sparkles'},
+  {key:'planning', label:'Planejamento', icon:'folder'},
+  {key:'journal', label:'Diário de Bordo', icon:'bookOpen'},
+  {key:'files', label:'Arquivos', icon:'paperclip'},
+  {key:'notes', label:'Notas', icon:'stickyNote'},
+];
+
+/* ============================== SEED DATA ============================== */
+function seedProject(over){
+  return Object.assign({
+    id: uid(), name:'', icon:'📁', color:'blue', objective:'', status:'Planejamento', priority:'Média',
+    startDate: todayISO(), deadline:'', responsible:'Rota', observations:'',
+    favorite:false, archived:false, tasks:[], journal:[], files:[], notes:'',
+    createdAt: Date.now(), updatedAt: Date.now(),
+  }, over);
+}
+function seedProjects(){
+  return [
+    seedProject({name:'Rota Singular', icon:'🧭', color:'blue', status:'Em andamento', priority:'Alta',
+      objective:'Marca responsável por projetos de educação, inovação, conteúdo digital e produtos.',
+      tasks:[{id:uid(), title:'Estruturar identidade de marca no Hub', done:false, dueDate:'', tag:'marca', favorite:false, isNext:true, createdAt:Date.now()}]}),
+    seedProject({name:'Dry System', icon:'💧', color:'yellow', status:'Em andamento', priority:'Média',
+      objective:'Gestão de marketing e conteúdo para cliente.',
+      tasks:[{id:uid(), title:'Planejar calendário de conteúdo do mês', done:false, dueDate:'', tag:'conteúdo', favorite:false, isNext:true, createdAt:Date.now()}]}),
+    seedProject({name:'Ela Organiza', icon:'🧹', color:'coral', status:'Em andamento', priority:'Alta',
+      objective:'Aplicativo para organização financeira de profissionais da limpeza.',
+      tasks:[{id:uid(), title:'Revisar landing page e identidade visual', done:false, dueDate:'', tag:'produto', favorite:false, isNext:true, createdAt:Date.now()}]}),
+    seedProject({name:'Currículos', icon:'📄', color:'purple', status:'Planejamento', priority:'Baixa',
+      objective:'Serviço de elaboração de currículos profissionais.',
+      tasks:[{id:uid(), title:'Criar modelo padrão de currículo', done:false, dueDate:'', tag:'modelo', favorite:false, isNext:true, createdAt:Date.now()}]}),
+    seedProject({name:'Trabalho', icon:'💼', color:'green', status:'Em andamento', priority:'Média',
+      objective:'Área destinada ao registro de aprendizados e evolução profissional.',
+      tasks:[{id:uid(), title:'Registrar aprendizados da semana', done:false, dueDate:'', tag:'evolução', favorite:false, isNext:true, createdAt:Date.now()}]}),
+  ];
+}
+function seedWeekly(){
+  return {objective:'Avançar o MVP do Hub e manter os projetos ativos em movimento.', priorities:['','',''],
+    mustNotDelay:'', agenda:[], checklist:[], fridaySummary:''};
+}
+function defaultState(){
+  return {theme:'light', projects: seedProjects(), weekly: seedWeekly(), activity: []};
+}
+
+/* ============================== STATE / STORAGE ============================== */
+const STORAGE_KEY = 'rotaSingularHubState';
+let state = loadState();
+let ui = {
+  view: {type:'dashboard'},
+  sidebarOpen:false, showActivity:false, modal:null, confirm:null,
+  search:'', dashStatus:'all', dashPriority:'all', dashFavOnly:false,
+  planQuery:'', planHideDone:false,
+};
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw){
+      const parsed = JSON.parse(raw);
+      return Object.assign(defaultState(), parsed);
+    }
+  }catch(e){ console.warn('Não foi possível carregar dados salvos, iniciando novo Hub.', e); }
+  return defaultState();
+}
+const saveState = debounce(() => {
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  catch(e){ console.error('Erro ao salvar localmente:', e); showToast('Erro ao salvar dados localmente.'); }
+}, 300);
+
+function log(text){
+  state.activity.unshift({id:uid(), text, ts:Date.now()});
+  state.activity = state.activity.slice(0,60);
+}
+function findProject(id){ return state.projects.find(p => p.id === id); }
+function touchProject(p){ p.updatedAt = Date.now(); }
+
+let toastTimer;
+function showToast(msg){
+  clearTimeout(toastTimer);
+  let el = document.getElementById('toast');
+  if (!el){ el = document.createElement('div'); el.id='toast'; el.className='toast'; document.body.appendChild(el); }
+  el.textContent = msg; el.classList.remove('hidden');
+  toastTimer = setTimeout(() => el.classList.add('hidden'), 2200);
+}
+
+/* ============================== ACTIONS (App) ============================== */
+const App = {
+  nav(view){ ui.modal=null; ui.confirm=null; ui.search=''; render(); window.scrollTo(0,0); ui.view = view; render(); },
+  toggleSidebar(open){ ui.sidebarOpen = open; render(); },
+  toggleTheme(){
+    state.theme = state.theme === 'dark' ? 'light' : 'dark';
+    document.body.setAttribute('data-theme', state.theme);
+    saveState(); render();
+  },
+  openActivity(){ ui.showActivity = true; render(); },
+  closeActivity(){ ui.showActivity = false; render(); },
+  openModal(type, projectId, payload){ ui.modal = {type, projectId, payload}; render(); },
+  closeModal(){ ui.modal = null; render(); },
+  askConfirm(message, onConfirm){ ui.confirm = {message, onConfirm}; render(); },
+  cancelConfirm(){ ui.confirm = null; render(); },
+  doConfirm(){ if (ui.confirm && ui.confirm.onConfirm) ui.confirm.onConfirm(); ui.confirm = null; },
+
+  runSearch(q){
+    ui.search = q;
+    renderSearchResults();
+  },
+  goSearchResult(type, projId, tab){
+    ui.search='';
+    const inp = document.getElementById('searchInput'); if (inp) inp.value='';
+    App.nav(type === 'project' ? {type:'project', id:projId, tab: tab||'overview'} : {type:'dashboard'});
+  },
+
+  setDashFilter(k, v){ ui[k] = v; render(); },
+
+  newProject(){ App.openModal('project'); },
+  editProject(id){ App.openModal('project', null, findProject(id)); },
+  saveProject(form, editingId){
+    if (editingId){
+      const p = findProject(editingId);
+      Object.assign(p, form); touchProject(p);
+      log('Projeto "' + p.name + '" atualizado');
+      App.closeModal();
+    } else {
+      const p = seedProject(Object.assign({}, form));
+      state.projects.push(p);
+      log('Projeto "' + p.name + '" criado');
+      ui.modal = null;
+      saveState();
+      App.nav({type:'project', id:p.id, tab:'overview'});
+      return;
+    }
+    saveState(); render();
+  },
+  deleteProject(id){
+    const p = findProject(id);
+    App.askConfirm('Excluir permanentemente o projeto "' + p.name + '"? Essa ação não pode ser desfeita.', () => {
+      state.projects = state.projects.filter(x => x.id !== id);
+      log('Projeto "' + p.name + '" excluído');
+      saveState();
+      App.nav({type:'dashboard'});
+    });
+  },
+  toggleArchiveProject(id){
+    const p = findProject(id); p.archived = !p.archived; touchProject(p);
+    log('Projeto "' + p.name + '" ' + (p.archived ? 'arquivado' : 'restaurado'));
+    saveState(); render();
+  },
+  toggleFavoriteProject(id){
+    const p = findProject(id); p.favorite = !p.favorite; touchProject(p);
+    saveState(); render();
+  },
+
+  addTaskOpen(projectId){ App.openModal('task', projectId); },
+  editTaskOpen(projectId, taskId){
+    const p = findProject(projectId); const tk = p.tasks.find(x=>x.id===taskId);
+    App.openModal('task', projectId, tk);
+  },
+  saveTask(projectId, form, editingId){
+    const p = findProject(projectId);
+    if (editingId){
+      const tk = p.tasks.find(x => x.id === editingId);
+      Object.assign(tk, form);
+      log('Ação "' + tk.title + '" atualizada em ' + p.name);
+    } else {
+      const makeNext = !p.tasks.some(t => t.isNext && !t.done);
+      const tk = Object.assign({id:uid(), done:false, favorite:false, isNext:makeNext, createdAt:Date.now()}, form);
+      p.tasks.push(tk);
+      log('Ação "' + tk.title + '" adicionada em ' + p.name);
+    }
+    touchProject(p); saveState(); App.closeModal();
+  },
+  deleteTask(projectId, taskId){
+    const p = findProject(projectId); const tk = p.tasks.find(x=>x.id===taskId);
+    App.askConfirm('Excluir a ação "' + tk.title + '"?', () => {
+      p.tasks = p.tasks.filter(x => x.id !== taskId);
+      touchProject(p); saveState(); render();
+    });
+  },
+  duplicateTask(projectId, taskId){
+    const p = findProject(projectId); const tk = p.tasks.find(x=>x.id===taskId);
+    const clone = Object.assign({}, tk, {id:uid(), title: tk.title + ' (cópia)', done:false, isNext:false, createdAt:Date.now()});
+    p.tasks.push(clone);
+    log('Ação duplicada em ' + p.name);
+    touchProject(p); saveState(); render();
+  },
+  setTaskNext(projectId, taskId){
+    const p = findProject(projectId);
+    p.tasks.forEach(tk => tk.isNext = (tk.id === taskId));
+    touchProject(p); saveState(); render();
+  },
+  toggleTaskDone(projectId, taskId){
+    const p = findProject(projectId); const tk = p.tasks.find(x=>x.id===taskId);
+    tk.done = !tk.done;
+    if (tk.done && tk.isNext){
+      tk.isNext = false;
+      const nextPending = p.tasks.find(x => !x.done);
+      if (nextPending) nextPending.isNext = true;
+    }
+    if (tk.done) log('"' + tk.title + '" concluída em ' + p.name);
+    touchProject(p); saveState(); render();
+  },
+
+  journalOpen(projectId){ App.openModal('journal', projectId); },
+  saveJournal(projectId, form){
+    const p = findProject(projectId);
+    p.journal.unshift(Object.assign({id:uid(), createdAt:Date.now()}, form));
+    log('Novo registro no diário de ' + p.name);
+    touchProject(p); saveState(); App.closeModal();
+  },
+  deleteJournal(projectId, entryId){
+    App.askConfirm('Excluir este registro do diário de bordo?', () => {
+      const p = findProject(projectId);
+      p.journal = p.journal.filter(j => j.id !== entryId);
+      touchProject(p); saveState(); render();
+    });
+  },
+
+  fileOpen(projectId){ App.openModal('file', projectId); },
+  saveFile(projectId, form){
+    const p = findProject(projectId);
+    p.files.unshift(Object.assign({id:uid()}, form));
+    touchProject(p); saveState(); App.closeModal();
+  },
+  deleteFile(projectId, fileId){
+    const p = findProject(projectId);
+    p.files = p.files.filter(f => f.id !== fileId);
+    touchProject(p); saveState(); render();
+  },
+
+  saveNotesDebounced: debounce((projectId, val) => {
+    const p = findProject(projectId); p.notes = val; touchProject(p); saveState();
+  }, 350),
+  onNotesInput(projectId, val){ App.saveNotesDebounced(projectId, val); },
+
+  setPlanFilter(k, v){ ui[k]=v; renderMain(); },
+  setTab(tab){ ui.view.tab = tab; render(); },
+
+  weeklyPatchDebounced: debounce((k, val) => { state.weekly[k] = val; saveState(); }, 350),
+  onWeeklyInput(k, val){ App.weeklyPatchDebounced(k, val); },
+  addWeeklyPriority(i, val){ state.weekly.priorities[i] = val; saveState(); },
+  addChecklistItem(){
+    const inp = document.getElementById('newChecklistInput');
+    const v = inp.value.trim(); if (!v) return;
+    state.weekly.checklist.push({id:uid(), text:v, done:false});
+    inp.value=''; saveState(); renderMain();
+  },
+  toggleChecklist(id){
+    const c = state.weekly.checklist.find(x=>x.id===id); c.done = !c.done; saveState(); renderMain();
+  },
+  removeChecklist(id){
+    state.weekly.checklist = state.weekly.checklist.filter(x=>x.id!==id); saveState(); renderMain();
+  },
+  addAgendaItem(){
+    const day = document.getElementById('newAgendaDay').value.trim() || '—';
+    const text = document.getElementById('newAgendaText').value.trim();
+    if (!text) return;
+    state.weekly.agenda.push({id:uid(), day, text});
+    document.getElementById('newAgendaDay').value=''; document.getElementById('newAgendaText').value='';
+    saveState(); renderMain();
+  },
+  removeAgenda(id){ state.weekly.agenda = state.weekly.agenda.filter(a=>a.id!==id); saveState(); renderMain(); },
+
+  exportBackup(){
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'rota-singular-hub-backup-' + todayISO() + '.json'; a.click();
+    URL.revokeObjectURL(url);
+  },
+  triggerImport(){ document.getElementById('importFileInput').click(); },
+  importBackup(input){
+    const file = input.files && input.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const parsed = JSON.parse(reader.result);
+        state = Object.assign(defaultState(), parsed);
+        document.body.setAttribute('data-theme', state.theme || 'light');
+        log('Backup importado');
+        saveState(); render();
+        showToast('Backup importado com sucesso.');
+      }catch(e){ alert('Arquivo de backup inválido.'); }
+    };
+    reader.readAsText(file);
+    input.value = '';
+  },
+  printProject(){ window.print(); },
+};
+
+/* ============================== RENDER: SHELL ============================== */
+function render(){
+  document.body.setAttribute('data-theme', state.theme);
+  const root = document.getElementById('root');
+  root.innerHTML = renderShell();
+  attachGlobalListeners();
+}
+
+function attachGlobalListeners(){
+  const si = document.getElementById('searchInput');
+  if (si){ si.addEventListener('input', e => App.runSearch(e.target.value)); }
+  const notesArea = document.getElementById('notesTextarea');
+  if (notesArea){ notesArea.addEventListener('input', e => App.onNotesInput(ui.view.id, e.target.value)); }
+  document.querySelectorAll('[data-weekly-field]').forEach(el => {
+    el.addEventListener('input', e => App.onWeeklyInput(el.getAttribute('data-weekly-field'), e.target.value));
+  });
+  document.querySelectorAll('[data-priority-field]').forEach((el,i) => {
+    el.addEventListener('input', e => App.addWeeklyPriority(Number(el.getAttribute('data-priority-field')), e.target.value));
+  });
+  const newChecklistInput = document.getElementById('newChecklistInput');
+  if (newChecklistInput){ newChecklistInput.addEventListener('keydown', e => { if (e.key==='Enter') App.addChecklistItem(); }); }
+}
+
+function renderShell(){
+  const isDark = state.theme === 'dark';
+  return `
+    ${renderDrawerOverlay()}
+    <div class="app">
+      <aside class="sidebar">${renderSidebarContent(false)}</aside>
+      <div class="main-col">
+        ${renderTopbar()}
+        <main class="print-area">${renderMain()}</main>
+      </div>
+    </div>
+    ${ui.showActivity ? renderActivityModal() : ''}
+    ${ui.modal ? renderModal() : ''}
+    ${ui.confirm ? renderConfirmModal() : ''}
+    <input id="importFileInput" type="file" accept="application/json" class="hidden" onchange="App.importBackup(this)" />
+  `;
+}
+
+function renderDrawerOverlay(){
+  return `<div class="drawer-overlay ${ui.sidebarOpen?'open':''}" onclick="App.toggleSidebar(false)">
+    <aside class="drawer slidein" onclick="event.stopPropagation()">${renderSidebarContent(true)}</aside>
+  </div>`;
+}
+
+function navBtnHtml(active, iconName, label, onclick){
+  return `<button class="navitem ${active?'active':''}" onclick="${onclick}">${icon(iconName,18)}<span>${label}</span></button>`;
+}
+
+function renderSidebarContent(isMobile){
+  const v = ui.view;
+  const closeSuffix = isMobile ? ';App.toggleSidebar(false)' : '';
+  let html = `
+    <div class="brand">
+      ${logoMark(34)}
+      <div>
+        <div class="brand-name">Rota Singular</div>
+        <div class="brand-sub">Hub</div>
+      </div>
+    </div>
+    ${navBtnHtml(v.type==='dashboard','home','Dashboard', "App.nav({type:'dashboard'})"+closeSuffix)}
+    ${navBtnHtml(v.type==='weekly','calendar','Semana', "App.nav({type:'weekly'})"+closeSuffix)}
+    <div class="side-label"><span>Projetos</span>
+      <button onclick="App.newProject()${closeSuffix}">${icon('plus',14)}</button>
+    </div>
+    <div class="proj-list">
+  `;
+  const active = state.projects.filter(p => !p.archived);
+  if (active.length === 0){ html += `<p style="font-size:12px;color:var(--textFaint);padding:6px 12px;">Nenhum projeto ativo.</p>`; }
+  active.forEach(p => {
+    const isActive = v.type==='project' && v.id===p.id;
+    html += `<button class="proj-item ${isActive?'active':''}" onclick="App.nav({type:'project', id:'${p.id}', tab:'overview'})${closeSuffix}">
+      <span class="proj-dot" style="background:${tone(p.color)}"></span>
+      <span class="name">${esc(p.name)}</span>
+      ${p.favorite ? `<span style="color:${tone(p.color)};flex-shrink:0;">${icon('star',12)}</span>` : ''}
+    </button>`;
+  });
+  html += `</div>
+    <div class="sidebar-footer">
+      ${navBtnHtml(false,'activity','Atividade', "App.openActivity()"+closeSuffix)}
+      <button class="theme-toggle" onclick="App.toggleTheme()">
+        ${icon(state.theme==='dark'?'sun':'moon',18)}<span>${state.theme==='dark'?'Modo claro':'Modo escuro'}</span>
+      </button>
+      <div class="backup-row">
+        <button class="backup-btn" onclick="App.exportBackup()">${icon('download',13)} Backup</button>
+        <button class="backup-btn" onclick="App.triggerImport()">${icon('upload',13)} Importar</button>
+      </div>
+    </div>
+  `;
+  return html;
+}
+
+function renderTopbar(){
+  return `
+  <header class="topbar no-print">
+    <button class="hamburger" onclick="App.toggleSidebar(true)">${icon('menu',20)}</button>
+    <div class="search-wrap">
+      ${icon('search',16)}
+      <input id="searchInput" class="search-input" placeholder="Buscar projetos ou ações…" value="${esc(ui.search)}" />
+      <div id="searchResultsWrap"></div>
+    </div>
+    <button class="icon-btn" title="Atividade" onclick="App.openActivity()">${icon('activity',18)}</button>
+    <button class="icon-btn" title="Alternar tema" onclick="App.toggleTheme()">${icon(state.theme==='dark'?'sun':'moon',18)}</button>
+    <button class="btn btn-primary small" style="white-space:nowrap" onclick="App.newProject()">${icon('plus',15)}<span class="btn-label">Novo</span></button>
+  </header>`;
+}
+
+function renderSearchResults(){
+  const wrap = document.getElementById('searchResultsWrap');
+  if (!wrap) return;
+  const q = ui.search.trim().toLowerCase();
+  if (!q){ wrap.innerHTML=''; return; }
+  const active = state.projects.filter(p => !p.archived);
+  const projMatches = active.filter(p => p.name.toLowerCase().includes(q) || p.objective.toLowerCase().includes(q)).slice(0,6);
+  const taskMatches = [];
+  active.forEach(p => p.tasks.forEach(tk => {
+    if (tk.title.toLowerCase().includes(q) || (tk.tag||'').toLowerCase().includes(q)) taskMatches.push({p,tk});
+  }));
+  const tm = taskMatches.slice(0,6);
+  let html = '<div class="search-results fadein">';
+  if (projMatches.length===0 && tm.length===0){ html += `<div class="search-empty">Nada encontrado.</div>`; }
+  projMatches.forEach(p => {
+    html += `<button onclick="App.goSearchResult('project','${p.id}','overview')">${icon('folder',13)} ${esc(p.name)} <span style="color:var(--textFaint);font-size:11px;margin-left:auto">projeto</span></button>`;
+  });
+  tm.forEach(({p,tk}) => {
+    html += `<button onclick="App.goSearchResult('project','${p.id}','planning')">${icon('circle',12)} ${esc(tk.title)} <span style="color:var(--textFaint);font-size:11px;margin-left:auto">${esc(p.name)}</span></button>`;
+  });
+  html += '</div>';
+  wrap.innerHTML = html;
+}
+
+function logoMark(size){
+  return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" style="flex-shrink:0">
+    <g style="mix-blend-mode:multiply">
+      <circle cx="38" cy="34" r="26" fill="#6E93C7" opacity="0.85"/>
+      <circle cx="64" cy="38" r="24" fill="#D9A93A" opacity="0.8"/>
+      <circle cx="42" cy="62" r="24" fill="#9A7FC7" opacity="0.8"/>
+      <circle cx="66" cy="64" r="24" fill="#D3616C" opacity="0.8"/>
+    </g>
+    <path d="M22 50 Q26 62 32 50 T42 50 Q44 68 50 50 T58 34 Q60 66 66 50 T76 46" fill="none" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+  </svg>`;
+}
+
+/* ============================== RENDER: MAIN ROUTES ============================== */
+function renderMain(){
+  const html = ui.view.type === 'dashboard' ? renderDashboard()
+    : ui.view.type === 'project' ? renderProjectPage(findProject(ui.view.id))
+    : ui.view.type === 'weekly' ? renderWeeklyPage()
+    : renderDashboard();
+  const m = document.querySelector('main');
+  if (m) m.innerHTML = html;
+  return html;
+}
+
+function greetingWord(){
+  const h = new Date().getHours();
+  return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+}
+function todayLabel(){
+  return new Date().toLocaleDateString('pt-BR', {weekday:'long', day:'numeric', month:'long'});
+}
+
+function renderDashboard(){
+  const active = state.projects.filter(p => !p.archived);
+  const withTasks = active.filter(p => p.tasks.length>0);
+  const totalTasks = withTasks.reduce((a,p)=>a+p.tasks.length,0);
+  const doneTasks = withTasks.reduce((a,p)=>a+p.tasks.filter(x=>x.done).length,0);
+  const overallProgress = totalTasks ? Math.round((doneTasks/totalTasks)*100) : 0;
+
+  const upcoming = active.filter(p=>p.deadline).sort((a,b)=>a.deadline.localeCompare(b.deadline)).slice(0,5);
+  const critical = [];
+  active.forEach(p => p.tasks.forEach(tk => { if (!tk.done && tk.dueDate && tk.dueDate < todayISO()) critical.push({p,tk}); }));
+  critical.sort((a,b)=>a.tk.dueDate.localeCompare(b.tk.dueDate));
+  const criticalTop = critical.slice(0,6);
+
+  const cl = state.weekly.checklist;
+  const weeklyPct = cl.length ? Math.round((cl.filter(c=>c.done).length/cl.length)*100) : 0;
+
+  let filtered = active
+    .filter(p => ui.dashStatus==='all' ? true : p.status===ui.dashStatus)
+    .filter(p => ui.dashPriority==='all' ? true : p.priority===ui.dashPriority)
+    .filter(p => ui.dashFavOnly ? p.favorite : true)
+    .sort((a,b)=>PRIORITY_WEIGHT[b.priority]-PRIORITY_WEIGHT[a.priority]);
+
+  return `
+  <div class="fadein">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:28px;">
+      <div>
+        <p class="greeting">${greetingWord()} ✨</p>
+        <p class="today-label">${esc(todayLabel())}</p>
+      </div>
+      <div class="no-print"><button class="btn btn-primary" onclick="App.newProject()">${icon('plus',16)} Adicionar projeto</button></div>
+    </div>
+
+    <div class="grid2" style="margin-bottom:16px;">
+      <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:8px;">${icon('target',16)}<span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--textFaint)">Objetivo da semana</span></div>
+        <p style="font-family:var(--font-display);font-size:18px;color:var(--text);line-height:1.35;">${esc(state.weekly.objective) || 'Defina o objetivo da semana.'}</p>
+        <button onclick="App.nav({type:'weekly'})" style="background:none;border:none;font-size:13.5px;font-weight:600;color:var(--textMuted);display:flex;align-items:center;gap:4px;width:fit-content;">
+          Ver semana ${icon('chevronRight',14)}
+        </button>
+      </div>
+      <div class="card" style="display:flex;flex-direction:column;gap:10px;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;">${icon('trendingUp',16)}<span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--textFaint)">Progresso geral</span></div>
+        <p style="font-family:var(--font-display);font-size:30px;font-weight:700;color:var(--text)">${overallProgress}%</p>
+        <div class="progress-track"><div class="progress-fill" style="width:${overallProgress}%;background:${tone('green')}"></div></div>
+      </div>
+    </div>
+
+    <div class="grid4" style="margin-bottom:16px;">
+      ${statCard('folder','Projetos ativos', active.length, 'blue')}
+      ${statCard('clock','Próximas entregas', upcoming.length, 'yellow')}
+      ${statCard('alertTriangle','Pendências críticas', critical.length, 'coral')}
+      ${statCard('checkCircle','Checklist da semana', weeklyPct+'%', 'purple')}
+    </div>
+
+    <div class="grid2-eq" style="margin-bottom:24px;">
+      <div class="card">
+        <p class="section-title">Próximas entregas</p>
+        ${upcoming.length===0 ? `<p style="font-size:13.5px;color:var(--textFaint)">Nenhum prazo definido ainda.</p>` :
+          upcoming.map(p => {
+            const du = daysUntil(p.deadline);
+            const label = du===0 ? 'hoje' : du<0 ? (Math.abs(du)+'d atrasado') : ('em '+du+'d');
+            return `<button class="list-row" onclick="App.nav({type:'project', id:'${p.id}', tab:'overview'})">
+              <span style="display:flex;align-items:center;gap:8px;color:var(--text)"><span class="proj-dot" style="background:${tone(p.color)}"></span>${esc(p.name)}</span>
+              <span style="color:${du<0?'var(--danger)':'var(--textMuted)'}">${label}</span>
+            </button>`;
+          }).join('')}
+      </div>
+      <div class="card">
+        <p class="section-title">Pendências críticas</p>
+        ${criticalTop.length===0 ? `<p style="font-size:13.5px;color:var(--textFaint)">Nada atrasado — ótimo trabalho.</p>` :
+          criticalTop.map(({p,tk}) => `<button class="list-row" onclick="App.nav({type:'project', id:'${p.id}', tab:'planning'})">
+              <span style="display:flex;align-items:center;gap:8px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${icon('alertTriangle',13)}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(tk.title)}</span></span>
+              <span style="font-size:12px;color:var(--textFaint);flex-shrink:0;margin-left:8px;">${esc(p.name)}</span>
+            </button>`).join('')}
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+        <p class="section-title" style="margin:0">Projetos (${filtered.length}/${active.length})</p>
+        <div class="filters-row">
+          <select class="select" style="width:auto" onchange="App.setDashFilter('dashStatus', this.value)">
+            <option value="all" ${ui.dashStatus==='all'?'selected':''}>Status</option>
+            ${STATUS_OPTIONS.map(s=>`<option value="${s}" ${ui.dashStatus===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+          <select class="select" style="width:auto" onchange="App.setDashFilter('dashPriority', this.value)">
+            <option value="all" ${ui.dashPriority==='all'?'selected':''}>Prioridade</option>
+            ${PRIORITY_OPTIONS.map(s=>`<option value="${s}" ${ui.dashPriority===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+          <button class="chip-toggle ${ui.dashFavOnly?'active':''}" onclick="App.setDashFilter('dashFavOnly', ${!ui.dashFavOnly})">${icon('star',13)} Favoritos</button>
+        </div>
+      </div>
+      ${filtered.length===0 ? emptyState('folder','Nenhum projeto encontrado','Ajuste os filtros ou crie um novo projeto.') :
+        `<div class="grid-cards">${filtered.map(p=>projectCard(p)).join('')}</div>`}
+    </div>
+  </div>`;
+}
+
+function statCard(iconName, label, value, colorKey){
+  return `<div class="card stat-card">
+    <div class="stat-icon" style="background:color-mix(in srgb, ${tone(colorKey)} 18%, transparent)">${icon(iconName,17)}<span style="color:${tone(colorKey)}"></span></div>
+    <div class="stat-value">${value}</div>
+    <div class="stat-label">${label}</div>
+  </div>`.replace('<div class="stat-icon" style="background:color-mix(in srgb, '+tone(colorKey)+' 18%, transparent)">'+icon(iconName,17), `<div class="stat-icon" style="background:color-mix(in srgb, ${tone(colorKey)} 18%, transparent);color:${tone(colorKey)}">`+icon(iconName,17));
+}
+
+function emptyState(iconName, title, sub){
+  return `<div class="empty-state"><div class="icon-wrap">${icon(iconName,20)}</div><p class="empty-title">${title}</p><p class="empty-sub">${sub}</p></div>`;
+}
+
+function projectCard(p){
+  const progress = projectProgress(p);
+  const nextTask = p.tasks.find(t=>t.isNext && !t.done) || p.tasks.find(t=>!t.done);
+  const du = p.deadline ? daysUntil(p.deadline) : null;
+  const duLabel = du===null ? '' : du<0 ? (Math.abs(du)+'d atrasado') : du===0 ? 'prazo hoje' : ('prazo em '+du+'d');
+  return `<div class="proj-card" onclick="App.nav({type:'project', id:'${p.id}', tab:'overview'})">
+    <div class="proj-card-head">
+      <div class="proj-card-title">
+        <div class="proj-icon" style="background:color-mix(in srgb, ${tone(p.color)} 22%, transparent)">${esc(p.icon)}</div>
+        <div style="min-width:0">
+          <div class="proj-card-name">${esc(p.name)}</div>
+        </div>
+      </div>
+      <button class="star-btn" onclick="event.stopPropagation();App.toggleFavoriteProject('${p.id}')">
+        <span style="color:${p.favorite?tone(p.color):'var(--textFaint)'}">${icon('star',16)}</span>
+      </button>
+    </div>
+    <p class="proj-card-obj">${esc(p.objective) || 'Sem objetivo definido.'}</p>
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+      ${badge(STATUS_TONE[p.status]||'blue', p.status)}
+      ${badge(PRIORITY_TONE(p.priority), icon('flag',11)+' '+p.priority, true)}
+      ${du!==null ? `<span style="font-size:11.5px;color:${du<0?'var(--danger)':'var(--textFaint)'}">${duLabel}</span>` : ''}
+    </div>
+    ${nextTask ? `<div class="proj-card-next">${icon('sparkles',13)}<span>${esc(nextTask.title)}</span></div>` : ''}
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="progress-track" style="height:6px"><div class="progress-fill" style="width:${progress}%;height:6px;background:${tone(p.color)}"></div></div>
+      <span style="font-size:11.5px;color:var(--textFaint);flex-shrink:0;">${progress}%</span>
+    </div>
+  </div>`;
+}
+
+function badge(colorKey, inner, subtle){
+  return `<span class="badge" style="background:color-mix(in srgb, ${tone(colorKey)} ${subtle?'14':'20'}%, transparent);color:${tone(colorKey)};border:1px solid color-mix(in srgb, ${tone(colorKey)} 35%, transparent)">${inner}</span>`;
+}
+
+/* ============================== PROJECT PAGE ============================== */
+function renderProjectPage(p){
+  if (!p) return emptyState('folder','Projeto não encontrado','Volte ao dashboard e selecione outro projeto.');
+  const tab = ui.view.tab || 'overview';
+  const progress = projectProgress(p);
+
+  let tabContent = '';
+  if (tab==='overview') tabContent = overviewTab(p);
+  else if (tab==='next') tabContent = nextActionTab(p);
+  else if (tab==='planning') tabContent = planningTab(p);
+  else if (tab==='journal') tabContent = journalTab(p);
+  else if (tab==='files') tabContent = filesTab(p);
+  else if (tab==='notes') tabContent = notesTab(p);
+
+  return `
+  <div class="fadein" style="--accent:${tone(p.color)}">
+    <div class="card proj-header">
+      <div class="proj-header-top">
+        <div class="proj-header-id">
+          <div class="proj-header-icon" style="background:color-mix(in srgb, ${tone(p.color)} 22%, transparent)">${esc(p.icon)}</div>
+          <div style="min-width:0">
+            <div class="proj-header-name">${esc(p.name)}</div>
+            <div class="proj-header-obj">${esc(p.objective)}</div>
+          </div>
+        </div>
+        <div class="proj-header-actions no-print">
+          <button class="icon-btn ${p.favorite?'active':''}" title="Favoritar" onclick="App.toggleFavoriteProject('${p.id}')">${icon('star',17)}</button>
+          <button class="icon-btn" title="${p.archived?'Restaurar':'Arquivar'}" onclick="App.toggleArchiveProject('${p.id}')">${icon(p.archived?'unarchive':'archive',17)}</button>
+          <button class="icon-btn" title="Exportar PDF" onclick="App.printProject()">${icon('printer',17)}</button>
+          <button class="icon-btn" title="Editar projeto" onclick="App.editProject('${p.id}')">${icon('edit',17)}</button>
+          <button class="icon-btn danger" title="Excluir projeto" onclick="App.deleteProject('${p.id}')">${icon('trash',17)}</button>
+        </div>
+      </div>
+      <div class="meta-row">
+        ${badge(STATUS_TONE[p.status]||'blue', p.status)}
+        ${badge(PRIORITY_TONE(p.priority), icon('flag',11)+' '+p.priority)}
+        <span title="Prazo" style="display:flex;align-items:center;gap:4px;">${icon('calendar',13)} ${fmtDate(p.deadline)}</span>
+        ${p.responsible ? `<span title="Responsável" style="display:flex;align-items:center;gap:4px;">${icon('user',13)} ${esc(p.responsible)}</span>` : ''}
+      </div>
+      <div class="progress-row">
+        <div class="progress-track" style="flex:1"><div class="progress-fill" style="width:${progress}%;background:${tone(p.color)}"></div></div>
+        <span style="font-size:13.5px;color:var(--textMuted);flex-shrink:0;">${progress}% concluído</span>
+      </div>
+    </div>
+
+    <div class="tabs no-print">
+      ${TABS.map(tb => `<button class="tab ${tab===tb.key?'active':''}" onclick="App.setTab('${tb.key}')">${icon(tb.icon,15)}${tb.label}</button>`).join('')}
+    </div>
+
+    <div id="tabContent">${tabContent}</div>
+  </div>`;
+}
+
+function overviewTab(p){
+  const doneCount = p.tasks.filter(x=>x.done).length;
+  return `<div class="grid-cards" style="grid-template-columns:1fr 1fr 1fr;">
+    <div class="card">
+      <p class="section-title">Resumo do projeto</p>
+      <p style="font-size:13.5px;color:var(--textMuted);line-height:1.5;">${esc(p.objective)||'Sem objetivo definido ainda.'}</p>
+      ${p.observations ? `<p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--textFaint);margin:14px 0 4px;">Observações</p>
+      <p style="font-size:13.5px;color:var(--textMuted);line-height:1.5;">${esc(p.observations)}</p>` : ''}
+    </div>
+    <div class="card">
+      <p class="section-title">Indicadores</p>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;">
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--textMuted)">Ações</span><span>${doneCount}/${p.tasks.length}</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--textMuted)">Diário</span><span>${p.journal.length}</span></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--textMuted)">Arquivos</span><span>${p.files.length}</span></div>
+        <div class="progress-track"><div class="progress-fill" style="width:${projectProgress(p)}%;background:${tone(p.color)}"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <p class="section-title">Status</p>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--textMuted)">Situação</span>${badge(STATUS_TONE[p.status]||'blue', p.status)}</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:var(--textMuted)">Prioridade</span>${badge(PRIORITY_TONE(p.priority), p.priority)}</div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--textMuted)">Última atualização</span><span>${new Date(p.updatedAt).toLocaleDateString('pt-BR')}</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function nextActionTab(p){
+  const nextTask = p.tasks.find(t=>t.isNext && !t.done);
+  const pending = p.tasks.filter(t=>!t.done && (!nextTask || t.id!==nextTask.id));
+  let html = '<div style="display:flex;flex-direction:column;gap:16px;">';
+  if (nextTask){
+    html += `<div class="next-hero" style="background:color-mix(in srgb, ${tone(p.color)} 12%, transparent);border:1px solid color-mix(in srgb, ${tone(p.color)} 28%, transparent)">
+      <div class="next-hero-icon" style="background:color-mix(in srgb, ${tone(p.color)} 20%, transparent);color:${tone(p.color)}">${icon('sparkles',22)}</div>
+      <p class="next-hero-label" style="color:${tone(p.color)}">Próxima ação principal</p>
+      <p class="next-hero-title">${esc(nextTask.title)}</p>
+      ${nextTask.dueDate ? `<p style="font-size:13.5px;color:var(--textMuted)">Prazo: ${fmtDate(nextTask.dueDate)}</p>` : ''}
+      <button class="btn btn-primary" onclick="App.toggleTaskDone('${p.id}','${nextTask.id}')">${icon('check',16)} Marcar como concluída</button>
+    </div>`;
+  } else {
+    html += emptyState('sparkles','Nenhuma próxima ação definida','Crie uma ação no Planejamento.');
+  }
+  if (pending.length>0){
+    html += `<div class="card"><p class="section-title">Trocar ação principal</p>
+      ${pending.slice(0,6).map(tk => `<button class="list-row" onclick="App.setTaskNext('${p.id}','${tk.id}')">
+        <span>${esc(tk.title)}</span>${icon('chevronRight',14)}
+      </button>`).join('')}
+    </div>`;
+  }
+  if (p.tasks.length===0){
+    html += `<div class="no-print"><button class="btn btn-secondary" onclick="App.addTaskOpen('${p.id}')">${icon('plus',16)} Criar primeira ação</button></div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+function planningTab(p){
+  const q = ui.planQuery.toLowerCase();
+  let tasks = p.tasks
+    .filter(tk => tk.title.toLowerCase().includes(q))
+    .filter(tk => ui.planHideDone ? !tk.done : true)
+    .sort((a,b) => a.done===b.done ? b.createdAt-a.createdAt : (a.done?1:-1));
+
+  let html = `<div style="display:flex;flex-direction:column;gap:14px;">
+    <div class="filters-row no-print">
+      <div style="position:relative;flex:1;min-width:160px;">
+        ${icon('search',14)}
+        <input class="input" style="padding-left:32px" placeholder="Buscar ações…" value="${esc(ui.planQuery)}"
+          oninput="App.setPlanFilter('planQuery', this.value)" />
+      </div>
+      <button class="chip-toggle ${ui.planHideDone?'active':''}" onclick="App.setPlanFilter('planHideDone', ${!ui.planHideDone})">${icon('filter',13)} Ocultar concluídas</button>
+      <button class="btn btn-primary small" onclick="App.addTaskOpen('${p.id}')">${icon('plus',15)} Nova ação</button>
+    </div>`;
+
+  if (tasks.length===0){
+    html += emptyState('folder','Nenhuma ação por aqui','Crie a primeira ação para este projeto.');
+  } else {
+    html += `<div style="display:flex;flex-direction:column;gap:8px;">`;
+    tasks.forEach(tk => {
+      html += `<div class="task-row">
+        <button onclick="App.toggleTaskDone('${p.id}','${tk.id}')" style="background:none;border:none;flex-shrink:0;color:${tk.done?tone(p.color):'var(--textFaint)'}">${icon(tk.done?'checkCircle':'circle',20)}</button>
+        <div style="min-width:0;flex:1;">
+          <p class="task-title ${tk.done?'done':''}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(tk.title)}</p>
+          <div class="task-meta">
+            ${(tk.isNext && !tk.done) ? badge('coral', icon('sparkles',10)+' principal', true) : ''}
+            ${tk.tag ? `<span class="tag-pill">${esc(tk.tag)}</span>` : ''}
+            ${tk.dueDate ? `<span style="font-size:11px;color:var(--textFaint)">${fmtDate(tk.dueDate)}</span>` : ''}
+          </div>
+        </div>
+        <div class="task-actions no-print">
+          ${(!tk.done && !tk.isNext) ? `<button class="icon-btn" title="Definir como principal" onclick="App.setTaskNext('${p.id}','${tk.id}')">${icon('sparkles',15)}</button>` : ''}
+          <button class="icon-btn" title="Duplicar" onclick="App.duplicateTask('${p.id}','${tk.id}')">${icon('copy',15)}</button>
+          <button class="icon-btn" title="Editar" onclick="App.editTaskOpen('${p.id}','${tk.id}')">${icon('edit',15)}</button>
+          <button class="icon-btn danger" title="Excluir" onclick="App.deleteTask('${p.id}','${tk.id}')">${icon('trash',15)}</button>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function journalTab(p){
+  let html = `<div style="display:flex;flex-direction:column;gap:14px;">
+    <div class="no-print"><button class="btn btn-primary small" onclick="App.journalOpen('${p.id}')">${icon('plus',15)} Novo registro semanal</button></div>`;
+  if (p.journal.length===0){
+    html += emptyState('bookOpen','Diário de bordo vazio','Registre semanalmente o que foi feito, dificuldades e aprendizados.');
+  } else {
+    html += `<div style="display:flex;flex-direction:column;gap:12px;">`;
+    p.journal.forEach(j => {
+      html += `<div class="journal-card">
+        <div class="journal-card-head">
+          <span style="font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:6px;color:${tone(p.color)}">${icon('clock',13)} ${fmtDate(j.week)}</span>
+          <button class="icon-btn danger" title="Excluir" onclick="App.deleteJournal('${p.id}','${j.id}')">${icon('trash',15)}</button>
+        </div>
+        <div class="journal-grid">
+          ${journalField('O que foi realizado', j.realizado)}
+          ${journalField('Dificuldades', j.dificuldades)}
+          ${journalField('Aprendizados', j.aprendizados)}
+          ${journalField('Decisões tomadas', j.decisoes)}
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+function journalField(label, value){
+  if (!value) return '';
+  return `<div><div class="jf-label">${label}</div><div class="jf-value">${esc(value)}</div></div>`;
+}
+
+function filesTab(p){
+  let html = `<div style="display:flex;flex-direction:column;gap:14px;">
+    <div class="no-print"><button class="btn btn-primary small" onclick="App.fileOpen('${p.id}')">${icon('plus',15)} Adicionar arquivo ou link</button></div>`;
+  if (p.files.length===0){
+    html += emptyState('paperclip','Nenhum arquivo anexado','Adicione links, documentos ou imagens.');
+  } else {
+    html += `<div class="files-grid">`;
+    p.files.forEach(f => {
+      html += `<a class="file-card" href="${esc(f.url||'#')}" target="_blank" rel="noreferrer">
+        <div class="file-icon" style="background:color-mix(in srgb, ${tone(p.color)} 22%, transparent);color:${tone(p.color)}">${icon(f.type==='link'?'link':'fileText',16)}</div>
+        <div style="min-width:0;flex:1;">
+          <div class="file-name">${esc(f.name)}</div>
+          <div class="file-url">${esc(f.url)}</div>
+        </div>
+        <button class="icon-btn danger no-print" style="position:absolute;top:8px;right:8px;" onclick="event.preventDefault();App.deleteFile('${p.id}','${f.id}')">${icon('trash',13)}</button>
+      </a>`;
+    });
+    html += `</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function notesTab(p){
+  return `<div class="card">
+    <p class="section-title">Notas livres</p>
+    <textarea id="notesTextarea" class="textarea" rows="14" placeholder="Escreva ideias, contexto ou lembretes sobre este projeto…">${esc(p.notes)}</textarea>
+    <p style="font-size:11.5px;color:var(--textFaint);margin-top:8px;">Salvo automaticamente.</p>
+  </div>`;
+}
+
+/* ============================== WEEKLY PAGE ============================== */
+function renderWeeklyPage(){
+  const w = state.weekly;
+  return `<div class="fadein" style="display:flex;flex-direction:column;gap:18px;">
+    <div>
+      <p class="weekly-title">Planejamento semanal</p>
+      <p style="font-size:13.5px;color:var(--textMuted)">Defina o foco da semana e o que não pode atrasar.</p>
+    </div>
+
+    <div class="card">
+      <p class="section-title">Objetivo da semana</p>
+      <textarea class="textarea" rows="2" data-weekly-field="objective" placeholder="Qual é o foco principal desta semana?">${esc(w.objective)}</textarea>
+    </div>
+
+    <div class="grid2-eq">
+      <div class="card">
+        <p class="section-title">Três prioridades</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${[0,1,2].map(i => `<input class="input" data-priority-field="${i}" value="${esc(w.priorities[i]||'')}" placeholder="Prioridade ${i+1}" />`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <p class="section-title">O que não pode atrasar</p>
+        <textarea class="textarea" rows="4" data-weekly-field="mustNotDelay" placeholder="Compromissos inadiáveis desta semana…">${esc(w.mustNotDelay)}</textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="section-title">Agenda da semana</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;">
+        ${w.agenda.length===0 ? `<p style="font-size:13.5px;color:var(--textFaint)">Nenhum compromisso adicionado.</p>` :
+          w.agenda.map(a => `<div class="agenda-item"><span><strong>${esc(a.day)}:</strong> ${esc(a.text)}</span>
+            <button class="no-print" style="background:none;border:none;color:var(--textFaint)" onclick="App.removeAgenda('${a.id}')">${icon('x',14)}</button></div>`).join('')}
+      </div>
+      <div class="inline-add no-print">
+        <input id="newAgendaDay" class="input" style="width:110px" placeholder="Dia (ex: Seg)" />
+        <input id="newAgendaText" class="input" style="flex:1;min-width:160px" placeholder="Compromisso" />
+        <button class="btn btn-primary small" onclick="App.addAgendaItem()">${icon('plus',14)} Adicionar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="section-title">Checklist da semana</p>
+      <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:8px;">
+        ${w.checklist.length===0 ? `<p style="font-size:13.5px;color:var(--textFaint)">Nenhum item ainda.</p>` :
+          w.checklist.map(c => `<div class="checklist-item">
+            <button style="background:none;border:none;color:${c.done?tone('green'):'var(--textFaint)'}" onclick="App.toggleChecklist('${c.id}')">${icon(c.done?'checkCircle':'circle',18)}</button>
+            <span style="flex:1;font-size:13.5px;color:${c.done?'var(--textFaint)':'var(--text)'};text-decoration:${c.done?'line-through':'none'}">${esc(c.text)}</span>
+            <button class="no-print" style="background:none;border:none;color:var(--textFaint)" onclick="App.removeChecklist('${c.id}')">${icon('x',14)}</button>
+          </div>`).join('')}
+      </div>
+      <div class="inline-add no-print">
+        <input id="newChecklistInput" class="input" style="flex:1" placeholder="Novo item do checklist" />
+        <button class="btn btn-primary small" onclick="App.addChecklistItem()">${icon('plus',14)} Adicionar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="section-title">Resumo da sexta-feira</p>
+      <textarea class="textarea" rows="4" data-weekly-field="fridaySummary" placeholder="Como foi a semana? O que avançou, o que ficou para trás?">${esc(w.fridaySummary)}</textarea>
+    </div>
+  </div>`;
+}
+
+/* ============================== ACTIVITY PANEL ============================== */
+function renderActivityModal(){
+  return `<div class="modal-overlay fadein" onclick="App.closeActivity()">
+    <div class="modal wide slideup" onclick="event.stopPropagation()">
+      <div class="modal-head"><h3>Histórico de alterações</h3><button class="icon-btn" onclick="App.closeActivity()">${icon('x',18)}</button></div>
+      ${state.activity.length===0 ? emptyState('activity','Nenhuma atividade ainda','As mudanças que você fizer no Hub aparecerão aqui.') :
+        `<div style="display:flex;flex-direction:column;gap:12px;max-height:55vh;overflow-y:auto;">
+          ${state.activity.map(a => `<div style="display:flex;align-items:flex-start;gap:10px;font-size:13.5px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--textFaint);margin-top:6px;flex-shrink:0;"></div>
+            <div><p style="color:var(--text)">${esc(a.text)}</p><p style="font-size:11px;color:var(--textFaint)">${new Date(a.ts).toLocaleString('pt-BR')}</p></div>
+          </div>`).join('')}
+        </div>`}
+      <div style="margin-top:20px;padding-top:14px;border-top:1px solid var(--border);display:flex;gap:10px;">
+        <button class="btn btn-secondary small" onclick="App.exportBackup()">${icon('download',14)} Exportar backup</button>
+        <button class="btn btn-secondary small" onclick="App.triggerImport()">${icon('upload',14)} Importar backup</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============================== CONFIRM MODAL ============================== */
+function renderConfirmModal(){
+  return `<div class="modal-overlay fadein" onclick="App.cancelConfirm()">
+    <div class="modal slideup" onclick="event.stopPropagation()">
+      <div class="modal-head"><h3>Confirmar ação</h3><button class="icon-btn" onclick="App.cancelConfirm()">${icon('x',18)}</button></div>
+      <p style="font-size:13.5px;color:var(--textMuted);margin-bottom:20px;">${esc(ui.confirm.message)}</p>
+      <div style="display:flex;justify-content:flex-end;gap:10px;">
+        <button class="btn btn-secondary" onclick="App.cancelConfirm()">Cancelar</button>
+        <button class="btn btn-danger" onclick="App.doConfirm()">Confirmar</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ============================== FORM MODALS ============================== */
+function renderModal(){
+  const type = ui.modal.type;
+  if (type==='project') return projectFormModal();
+  if (type==='task') return taskFormModal();
+  if (type==='journal') return journalFormModal();
+  if (type==='file') return fileFormModal();
+  return '';
+}
+
+function projectFormModal(){
+  const editing = ui.modal.payload;
+  const f = editing || {name:'', icon:'📁', color:'blue', objective:'', status:'Planejamento', priority:'Média', startDate:todayISO(), deadline:'', responsible:'', observations:''};
+  const icons = ['📁','🧭','💧','🧹','📄','💼','🎯','🚀','🌱','✨'];
+  return `<div class="modal-overlay fadein" onclick="App.closeModal()">
+    <div class="modal wide slideup" onclick="event.stopPropagation()">
+      <div class="modal-head"><h3>${editing?'Editar projeto':'Novo projeto'}</h3><button class="icon-btn" onclick="App.closeModal()">${icon('x',18)}</button></div>
+      <form id="projectForm" onsubmit="return false;">
+        <div class="field"><label>Nome do projeto</label><input id="pf_name" class="input" value="${esc(f.name)}" placeholder="Ex: Ela Organiza" /></div>
+        <div class="field"><label>Ícone</label><div style="display:flex;gap:6px;flex-wrap:wrap;" id="pf_iconPicker">
+          ${icons.map(ic => `<button type="button" class="icon-pick ${f.icon===ic?'active':''}" data-icon="${ic}" onclick="selectPickerValue(this,'pf_iconPicker','data-icon')">${ic}</button>`).join('')}
+        </div></div>
+        <div class="field"><label>Cor</label><div style="display:flex;gap:8px;" id="pf_colorPicker">
+          ${BRAND_KEYS.map(k => `<button type="button" class="color-dot ${f.color===k?'active':''}" data-color="${k}" style="background:${tone(k)}" onclick="selectPickerValue(this,'pf_colorPicker','data-color')"></button>`).join('')}
+        </div></div>
+        <div class="field"><label>Objetivo</label><textarea id="pf_objective" class="textarea" rows="2" placeholder="Qual é o propósito deste projeto?">${esc(f.objective)}</textarea></div>
+        <div class="row2">
+          <div class="field"><label>Status</label><select id="pf_status" class="select">${STATUS_OPTIONS.map(s=>`<option value="${s}" ${f.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+          <div class="field"><label>Prioridade</label><select id="pf_priority" class="select">${PRIORITY_OPTIONS.map(s=>`<option value="${s}" ${f.priority===s?'selected':''}>${s}</option>`).join('')}</select></div>
+          <div class="field"><label>Data de início</label><input id="pf_startDate" type="date" class="input" value="${esc(f.startDate)}" /></div>
+          <div class="field"><label>Prazo</label><input id="pf_deadline" type="date" class="input" value="${esc(f.deadline)}" /></div>
+        </div>
+        <div class="field"><label>Responsável</label><input id="pf_responsible" class="input" value="${esc(f.responsible)}" placeholder="Quem cuida deste projeto?" /></div>
+        <div class="field"><label>Observações</label><textarea id="pf_observations" class="textarea" rows="2">${esc(f.observations)}</textarea></div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:6px;">
+          <button type="button" class="btn btn-secondary" onclick="App.closeModal()">Cancelar</button>
+          <button type="button" class="btn btn-primary" onclick="submitProjectForm(${editing?`'${editing.id}'`:'null'})">Salvar projeto</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+function selectPickerValue(btn, wrapId, attr){
+  const wrap = document.getElementById(wrapId);
+  Array.from(wrap.children).forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+}
+function submitProjectForm(editingId){
+  const wrap = id => document.getElementById(id);
+  const iconBtn = document.querySelector('#pf_iconPicker .active');
+  const colorBtn = document.querySelector('#pf_colorPicker .active');
+  const name = wrap('pf_name').value.trim();
+  if (!name){ wrap('pf_name').focus(); return; }
+  const form = {
+    name,
+    icon: iconBtn ? iconBtn.getAttribute('data-icon') : '📁',
+    color: colorBtn ? colorBtn.getAttribute('data-color') : 'blue',
+    objective: wrap('pf_objective').value,
+    status: wrap('pf_status').value,
+    priority: wrap('pf_priority').value,
+    startDate: wrap('pf_startDate').value,
+    deadline: wrap('pf_deadline').value,
+    responsible: wrap('pf_responsible').value,
+    observations: wrap('pf_observations').value,
+  };
+  App.saveProject(form, editingId);
+}
+
+function taskFormModal(){
+  const editing = ui.modal.payload;
+  const f = editing || {title:'', dueDate:'', tag:''};
+  return `<div class="modal-overlay fadein" onclick="App.closeModal()">
+    <div class="modal slideup" onclick="event.stopPropagation()">
+      <div class="modal-head"><h3>${editing?'Editar ação':'Nova ação'}</h3><button class="icon-btn" onclick="App.closeModal()">${icon('x',18)}</button></div>
+      <div class="field"><label>Título da ação</label><input id="tf_title" class="input" value="${esc(f.title)}" placeholder="O que precisa ser feito?" /></div>
+      <div class="row2">
+        <div class="field"><label>Prazo (opcional)</label><input id="tf_dueDate" type="date" class="input" value="${esc(f.dueDate)}" /></div>
+        <div class="field"><label>Etiqueta (opcional)</label><input id="tf_tag" class="input" value="${esc(f.tag)}" placeholder="ex: design" /></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:6px;">
+        <button class="btn btn-secondary" onclick="App.closeModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="submitTaskForm(${editing?`'${editing.id}'`:'null'})">Salvar ação</button>
+      </div>
+    </div>
+  </div>`;
+}
+function submitTaskForm(editingId){
+  const title = document.getElementById('tf_title').value.trim();
+  if (!title){ document.getElementById('tf_title').focus(); return; }
+  const form = {title, dueDate: document.getElementById('tf_dueDate').value, tag: document.getElementById('tf_tag').value};
+  App.saveTask(ui.modal.projectId, form, editingId);
+}
+
+function journalFormModal(){
+  return `<div class="modal-overlay fadein" onclick="App.closeModal()">
+    <div class="modal wide slideup" onclick="event.stopPropagation()">
+      <div class="modal-head"><h3>Novo registro no diário de bordo</h3><button class="icon-btn" onclick="App.closeModal()">${icon('x',18)}</button></div>
+      <div class="field"><label>Semana</label><input id="jf_week" type="date" class="input" value="${todayISO()}" /></div>
+      <div class="field"><label>O que foi realizado</label><textarea id="jf_realizado" class="textarea" rows="2"></textarea></div>
+      <div class="field"><label>Dificuldades</label><textarea id="jf_dificuldades" class="textarea" rows="2"></textarea></div>
+      <div class="field"><label>Aprendizados</label><textarea id="jf_aprendizados" class="textarea" rows="2"></textarea></div>
+      <div class="field"><label>Decisões tomadas</label><textarea id="jf_decisoes" class="textarea" rows="2"></textarea></div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:6px;">
+        <button class="btn btn-secondary" onclick="App.closeModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="submitJournalForm()">Salvar registro</button>
+      </div>
+    </div>
+  </div>`;
+}
+function submitJournalForm(){
+  const form = {
+    week: document.getElementById('jf_week').value || todayISO(),
+    realizado: document.getElementById('jf_realizado').value,
+    dificuldades: document.getElementById('jf_dificuldades').value,
+    aprendizados: document.getElementById('jf_aprendizados').value,
+    decisoes: document.getElementById('jf_decisoes').value,
+  };
+  App.saveJournal(ui.modal.projectId, form);
+}
+
+function fileFormModal(){
+  return `<div class="modal-overlay fadein" onclick="App.closeModal()">
+    <div class="modal slideup" onclick="event.stopPropagation()">
+      <div class="modal-head"><h3>Adicionar arquivo ou link</h3><button class="icon-btn" onclick="App.closeModal()">${icon('x',18)}</button></div>
+      <div class="field"><label>Nome</label><input id="ff_name" class="input" placeholder="Ex: Manual de marca" /></div>
+      <div class="field"><label>Link (URL)</label><input id="ff_url" class="input" placeholder="https://…" /></div>
+      <div class="field"><label>Tipo</label><select id="ff_type" class="select">
+        <option value="link">Link</option><option value="document">Documento</option><option value="image">Imagem</option>
+      </select></div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:6px;">
+        <button class="btn btn-secondary" onclick="App.closeModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="submitFileForm()">Adicionar</button>
+      </div>
+    </div>
+  </div>`;
+}
+function submitFileForm(){
+  const name = document.getElementById('ff_name').value.trim();
+  if (!name){ document.getElementById('ff_name').focus(); return; }
+  const form = {name, url: document.getElementById('ff_url').value, type: document.getElementById('ff_type').value};
+  App.saveFile(ui.modal.projectId, form);
+}
+
+/* ============================== INIT ============================== */
+document.body.setAttribute('data-theme', state.theme || 'light');
+render();
+</script>
+</body>
+</html>
